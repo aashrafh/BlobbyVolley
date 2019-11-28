@@ -20,7 +20,7 @@
 	WALL_SIZE_Y DW 100
 	;;;;;;;;;;;;;;;;;
 	
-	;;;;;;;;;;;;;;;;;
+	;;;;;;;;;;;;;;;;;           Player One           ;;;;;;;;;;;;;;;;;         
 	PlayerOneX DW 0H   			;X position of the first player
 	PlayerOneY DW 0A0H			;Y position of the first player
 	PlayerOneXSize DW 0AH 		;size of the first player in X direction
@@ -212,10 +212,18 @@
 			
 		RET
 	DrawFirstPlayer ENDP
+	
 	movePLayer PROC NEAR
 		;READ CHARACTER FROM KEYBOARD
-		MOV AH, 01H
-		INT 21H
+		 
+		mov ah,1
+		int 16h
+		jz DONE
+		;MOV AH, 01H
+		;INT 21H
+		
+		mov ah,0
+		int 16h
 		
 		CMP AL, 'w'
 		JZ Up
@@ -225,39 +233,48 @@
 		;Right
 		CMP AL, 'd'
 		JZ Right
+		
+		JMP DEFAULT
 		;Generate a move to
 		Right:         
 			MOV AX,PlayerVelocityX
 			ADD PlayerOneX,AX
-			MOV AX, 3CH
+			MOV AX, 100
 			CMP PlayerOneX, AX
 			JG DECREASEX
 			RET
 		Left:
 			MOV AX,PlayerVelocityX
 			SUB PlayerOneX,AX
-			MOV AX, 05H
+			MOV AX, 5
 			CMP PlayerOneX, AX
 			JL INCREASEX
 			RET
 		Up:
 			MOV AX,PlayerVelocityY
 			SUB PlayerOneY,AX
-			MOV AX, 05H
+			MOV AX, 5
 			CMP PlayerOneY, AX
 			JL INCREASEY
 			RET
-			
-		DECREASEX: 
-			DEC PlayerOneX
+		
+		DEFAULT: 
+			RET
+		
+		DECREASEX:
+			MOV AX, 0AH;
+			SUB PlayerOneX, AX
 			RET
 		INCREASEX: 
-			INC PlayerOneX
+			MOV AX, 0AH;
+			ADD PlayerOneX, AX
 			RET
 		INCREASEY: 
-			INC PlayerOneY
+			MOV AX, 0AH;
+			ADD PlayerOneY, AX
 			RET
-		RET
+			
+		DONE: RET
 	movePlayer ENDP
 	
 	PUSHA_UD PROC NEAR
