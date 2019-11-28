@@ -21,6 +21,15 @@
 	WALL_SIZE_Y EQU 100
 	;;;;;;;;;;;;;;;;;
 	
+	;;;;;;;;;;;;;;;;;           Player One           ;;;;;;;;;;;;;;;;;         
+	PlayerOneX DW 0H   			;X position of the first player
+	PlayerOneY DW 0A0H			;Y position of the first player
+	PlayerOneXSize DW 0AH 		;size of the first player in X direction
+	PlayerOneYSize DW 14H 		;size of the first player in Y direction
+	PlayerVelocityX DW 0AH      ;X (horizontal) velocity of the player
+	PlayerVelocityY DW 0FH      ;Y (vertical) velocity of the player
+	;;;;;;;;;;;;;;;;;
+	
 .CODE 
 	MAIN PROC FAR
 	MOV AX, @DATA
@@ -45,7 +54,8 @@
 			
 			CALL DRAW_WALL
 			CALL DRAW_BALL 
-			
+			CALL DrawFirstPlayer    ;NOTE: this proc affects the flag registers, BE CAREFULL 
+			CALL movePLayer			;get move from the user using the keyboard
 			JMP CHECK_TIME ;after everything checks time again
 			
 		;return the control to the dos
@@ -172,6 +182,120 @@
 		
 		RET
 	DRAW_WALL ENDP
+	
+	DrawFirstPlayer PROC NEAR
+		MOV CX, PlayerOneX	;X = COLUMN
+		MOV DX, PlayerOneY	;Y = ROW
+			
+		Draw:
+			;Write graphics pixel
+			MOV AH, 0CH 			;SET CONFIGURATION TO WRITE A PIXEL
+			MOV AL, 0CH 			;CHOOSE PIXL COLOR
+			MOV BH, 00H				;PAGE NUMBER
+			INT 10H					;EXECUTE
+			
+			INC CX 					;CX = CX + 1
+			MOV AX, CX				;TMP FOR THE SUBTRACTION
+			SUB AX, PlayerOneX  	;AX = AX - PlayerOneX
+			CMP AX, PlayerOneXSize 	;If AX - PlayerOneX > PlayerOneXSize
+			JNG Draw 				;Go to the next line if not greater just proceed drawing horizontally
+			
+			MOV CX, PlayerOneX		;Start drawing from the begining in the second line
+			INC DX 					;proceed to the next line i.e. DX = DX + 1
+				
+			MOV AX, DX				;TMP FOR THE SUBTRACTION
+			SUB AX, PlayerOneY  	;AX = AX - PlayerOneY
+			CMP AX, PlayerOneYSize 	;If AX - PlayerOneY > PlayerOneYSize
+			JNG Draw 				;exit the proc if not greater just proceed drawing
+			
+		RET
+	DrawFirstPlayer ENDP
+	
+	movePLayer PROC NEAR
+		;READ CHARACTER FROM KEYBOARD
+		 
+		mov ah,1
+		int 16h
+		jz DONE
+		;MOV AH, 01H
+		;INT 21H
+		
+		mov ah,0
+		int 16h
+		
+		CMP AL, 'w'
+		JZ Up
+		;Left
+		CMP AL, 'a'
+		JZ Left
+		;Right
+		CMP AL, 'd'
+		JZ Right
+		
+		JMP DEFAULT
+		;Generate a move to
+		Right:         
+			MOV AX,PlayerVelocityX
+			ADD PlayerOneX,AX
+			MOV AX, 100
+			CMP PlayerOneX, AX
+			JG DECREASEX
+			RET
+		Left:
+			MOV AX,PlayerVelocityX
+			SUB PlayerOneX,AX
+			MOV AX, 5
+			CMP PlayerOneX, AX
+			JL INCREASEX
+			RET
+		Up:
+			MOV AX,PlayerVelocityY
+			SUB PlayerOneY,AX
+			MOV AX, 5
+			CMP PlayerOneY, AX
+			JL INCREASEY
+			RET
+		
+		DEFAULT: 
+			RET
+		
+		DECREASEX:
+			MOV AX, 0AH;
+			SUB PlayerOneX, AX
+			RET
+		INCREASEX: 
+			MOV AX, 0AH;
+			ADD PlayerOneX, AX
+			RET
+		INCREASEY: 
+			MOV AX, 0AH;
+			ADD PlayerOneY, AX
+			RET
+			
+		DONE: RET
+	movePlayer ENDP
+	
+	PUSHA_UD PROC NEAR
+	PUSH AX
+	PUSH BX
+	PUSH CX
+	PUSH DX
+	
+	PUSHF
+	
+	RET
+	PUSHA_UD ENDP
+	
+	POPA_UD PROC NEAR
+	POPF
+	
+	PUSH DX
+	PUSH CX
+	PUSH BX
+	PUSH AX
+	
+	RET
+	POPA_UD ENDP
 	
 	CHECK_WALL_X PROC NEAR
 	MOV AX, 0
