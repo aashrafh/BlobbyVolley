@@ -3,21 +3,22 @@
 .DATA
 	WINDOW_WIDTH DW 140h   ;the width of the window (320 pixels)
 	WINDOW_HEIGHT DW 0C8h  ;the height of the window (200 pixels)
-	WINDOW_BOUNDS DW 5     ;variable used to check collisions early
-	
+	WINDOW_BOUNDS EQU 6    ;variable used to check collisions early
+						   ;must be more than the ball size to avoid ball glitching
+						   
 	TIME_AUX DB 0 ;variable used when checking if the time has changed
 	
 	BALL_X DW 20 ;X position (column) of the ball
 	BALL_Y DW 20 ;Y position (line) of the ball
-	BALL_SIZE DW 08h ;size of the ball (how many pixels does the ball have in width and height)
+	BALL_SIZE EQU 08h ;size of the ball (how many pixels does the ball have in width and height)
 	BALL_VELOCITY_X DW 04H ;X (horizontal) velocity of the ball
 	BALL_VELOCITY_Y DW 02H ;Y (vertical) velocity of the ball
 	
 	;;;;;;;;;;;;;;;;;
-	WALL_X DW 155
-	WALL_Y DW 100
-	WALL_SIZE_X DW 10
-	WALL_SIZE_Y DW 100
+	WALL_X EQU 155
+	WALL_Y EQU 100
+	WALL_SIZE_X EQU 10
+	WALL_SIZE_Y EQU 100
 	;;;;;;;;;;;;;;;;;
 	
 .CODE 
@@ -26,9 +27,6 @@
 	MOV DS, AX
 	
 		CALL CLEAR_SCREEN
-		
-		;CALL PUSHA_UD
-		;CALL POPA_UD
 		
 		CHECK_TIME:
 		
@@ -175,35 +173,13 @@
 		RET
 	DRAW_WALL ENDP
 	
-	PUSHA_UD PROC NEAR
-	PUSH AX
-	PUSH BX
-	PUSH CX
-	PUSH DX
-	
-	PUSHF
-	
-	RET
-	PUSHA_UD ENDP
-	
-	POPA_UD PROC NEAR
-	POPF
-	
-	PUSH DX
-	PUSH CX
-	PUSH BX
-	PUSH AX
-	
-	RET
-	POPA_UD ENDP
-	
 	CHECK_WALL_X PROC NEAR
 	MOV AX, 0
-	CMP BALL_X, 150
+	CMP BALL_X, (WALL_X - WINDOW_BOUNDS)
 	JB RETURN
-	CMP BALL_X, 170
+	CMP BALL_X, (WALL_X + WALL_SIZE_X + WINDOW_BOUNDS) 
 	JA RETURN
-	CMP BALL_Y, 100
+	CMP BALL_Y, WALL_Y
 	JB RETURN
 	MOV AX, 1
 	RETURN:
@@ -212,13 +188,13 @@
 	
 	CHECK_WALL_Y PROC NEAR
 	MOV AX, 0
-	CMP BALL_X, 155
+	CMP BALL_X, WALL_X
 	JB RETURN2
-	CMP BALL_X, 165
+	CMP BALL_X, (WALL_X + WALL_SIZE_X)
 	JA RETURN2
-	CMP BALL_Y, 100
+	CMP BALL_Y, WALL_Y
 	JB RETURN2
-	CMP BALL_Y, 110
+	CMP BALL_Y, (WALL_Y + 10)
 	JA RETURN2
 	MOV AX, 1
 	RETURN2:
