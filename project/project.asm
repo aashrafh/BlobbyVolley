@@ -22,12 +22,12 @@
 	;;;;;;;;;;;;;;;;;
 	
 	;;;;;;;;;;;;;;;;;           Player One           ;;;;;;;;;;;;;;;;;         
-	PlayerOneX DW 0H   			;X position of the first player
-	PlayerOneY DW 0A0H			;Y position of the first player
-	PlayerOneXSize DW 0AH 		;size of the first player in X direction
-	PlayerOneYSize DW 14H 		;size of the first player in Y direction
-	PlayerVelocityX DW 0AH      ;X (horizontal) velocity of the player
-	PlayerVelocityY DW 0FH      ;Y (vertical) velocity of the player
+	PLAYER_ONE_X DW 0H   			;X position of the first player
+	PLAYER_ONE_Y DW 0A0H			;Y position of the first player
+	PLAYER_ONE_X_SIZE DW 0AH 		;size of the first player in X direction
+	PLAYER_ONE_Y_SIZE DW 14H 		;size of the first player in Y direction
+	PLAYER_VELOCITY_X DW 0AH      ;X (horizontal) velocity of the player
+	PLAYER_VELOCITY_Y DW 0FH      ;Y (vertical) velocity of the player
 	;;;;;;;;;;;;;;;;;
 	
 .CODE 
@@ -54,8 +54,8 @@
 			
 			CALL DRAW_WALL
 			CALL DRAW_BALL 
-			CALL DrawFirstPlayer    ;NOTE: this proc affects the flag registers, BE CAREFULL 
-			CALL movePLayer			;get move from the user using the keyboard
+			CALL DRAW_FIRST_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
+			CALL MOVE_PLAYER			;get move from the user using the keyboard
 			JMP CHECK_TIME ;after everything checks time again
 			
 		;return the control to the dos
@@ -183,9 +183,9 @@
 		RET
 	DRAW_WALL ENDP
 	
-	DrawFirstPlayer PROC NEAR
-		MOV CX, PlayerOneX	;X = COLUMN
-		MOV DX, PlayerOneY	;Y = ROW
+	DRAW_FIRST_PLAYER PROC NEAR
+		MOV CX, PLAYER_ONE_X	;X = COLUMN
+		MOV DX, PLAYER_ONE_Y	;Y = ROW
 			
 		Draw:
 			;Write graphics pixel
@@ -196,22 +196,22 @@
 			
 			INC CX 					;CX = CX + 1
 			MOV AX, CX				;TMP FOR THE SUBTRACTION
-			SUB AX, PlayerOneX  	;AX = AX - PlayerOneX
-			CMP AX, PlayerOneXSize 	;If AX - PlayerOneX > PlayerOneXSize
+			SUB AX, PLAYER_ONE_X  	;AX = AX - PLAYER_ONE_X
+			CMP AX, PLAYER_ONE_X_SIZE 	;If AX - PLAYER_ONE_X > PLAYER_ONE_X_SIZE
 			JNG Draw 				;Go to the next line if not greater just proceed drawing horizontally
 			
-			MOV CX, PlayerOneX		;Start drawing from the begining in the second line
+			MOV CX, PLAYER_ONE_X		;Start drawing from the begining in the second line
 			INC DX 					;proceed to the next line i.e. DX = DX + 1
 				
 			MOV AX, DX				;TMP FOR THE SUBTRACTION
-			SUB AX, PlayerOneY  	;AX = AX - PlayerOneY
-			CMP AX, PlayerOneYSize 	;If AX - PlayerOneY > PlayerOneYSize
+			SUB AX, PLAYER_ONE_Y  	;AX = AX - PLAYER_ONE_Y
+			CMP AX, PLAYER_ONE_Y_SIZE 	;If AX - PLAYER_ONE_Y > PLAYER_ONE_Y_SIZE
 			JNG Draw 				;exit the proc if not greater just proceed drawing
 			
 		RET
-	DrawFirstPlayer ENDP
+	DRAW_FIRST_PLAYER ENDP
 	
-	movePLayer PROC NEAR
+	MOVE_PLAYER PROC NEAR
 		;READ CHARACTER FROM KEYBOARD
 		 
 		mov ah,1
@@ -235,24 +235,24 @@
 		JMP DEFAULT
 		;Generate a move to
 		Right:         
-			MOV AX,PlayerVelocityX
-			ADD PlayerOneX,AX
+			MOV AX,PLAYER_VELOCITY_X
+			ADD PLAYER_ONE_X,AX
 			MOV AX, 100
-			CMP PlayerOneX, AX
+			CMP PLAYER_ONE_X, AX
 			JG DECREASEX
 			RET
 		Left:
-			MOV AX,PlayerVelocityX
-			SUB PlayerOneX,AX
+			MOV AX,PLAYER_VELOCITY_X
+			SUB PLAYER_ONE_X,AX
 			MOV AX, 5
-			CMP PlayerOneX, AX
+			CMP PLAYER_ONE_X, AX
 			JL INCREASEX
 			RET
 		Up:
-			MOV AX,PlayerVelocityY
-			SUB PlayerOneY,AX
+			MOV AX,PLAYER_VELOCITY_Y
+			SUB PLAYER_ONE_Y,AX
 			MOV AX, 5
-			CMP PlayerOneY, AX
+			CMP PLAYER_ONE_Y, AX
 			JL INCREASEY
 			RET
 		
@@ -261,19 +261,19 @@
 		
 		DECREASEX:
 			MOV AX, 0AH;
-			SUB PlayerOneX, AX
+			SUB PLAYER_ONE_X, AX
 			RET
 		INCREASEX: 
 			MOV AX, 0AH;
-			ADD PlayerOneX, AX
+			ADD PLAYER_ONE_X, AX
 			RET
 		INCREASEY: 
 			MOV AX, 0AH;
-			ADD PlayerOneY, AX
+			ADD PLAYER_ONE_Y, AX
 			RET
 			
 		DONE: RET
-	movePlayer ENDP
+	MOVE_PLAYER ENDP
 	
 	CHECK_WALL_X PROC NEAR
 	MOV AX, 0
