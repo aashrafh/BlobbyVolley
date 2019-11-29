@@ -108,19 +108,35 @@
 		JE NEG_VELOCITY_X
 		
 		;Check PlayerOne
-		PUSH AX                 ;Just becuase I'm not sure if it will affects something else
 		MOV AX, PLAYER_ONE_WIDTH
 		ADD AX, PLAYER_ONE_X
 		CMP AX, BALL_X
-		JE NEG_VELOCITY_X
+		JE Y_TOP_BOUNDARY
 		
 		MOV AX, BALL_X
 		ADD AX, BALL_SIZE
 		CMP AX, PLAYER_ONE_X
-		JE NEG_VELOCITY_X
-		POP AX
+		JE Y_TOP_BOUNDARY
+		
+		;Default
 		JMP CHECK_Y
 		
+		;If the ball in the same X point then I need to validate that the ball in the same y range
+		;PLAYER_ONE_Y <= BALL_Y
+		Y_TOP_BOUNDARY:
+			MOV AX, BALL_Y
+			CMP AX, PLAYER_ONE_Y          
+			JGE Y_BOTTOM_BOUNDARY
+			JMP CHECK_Y
+		;BALL_Y+BALL_SIZE <= PLAYER_ONE_Y+PLAYER_ONE_HIGHT
+		Y_BOTTOM_BOUNDARY:
+			MOV BX, PLAYER_ONE_Y
+			ADD AX, BALL_SIZE
+			ADD BX, PLAYER_ONE_HIGHT
+			CMP AX, BX
+			JLE NEG_VELOCITY_X
+			JMP CHECK_Y
+			
 		NEG_VELOCITY_X:
 			NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
 		
@@ -142,29 +158,39 @@
 		JE NEG_VELOCITY_Y
 		
 		;Check PlayerOne
-		PUSH AX                 ;Just becuase I'm not sure if it will affects something else
 		MOV AX, BALL_Y
 		ADD AX, BALL_SIZE
 		CMP AX, PLAYER_ONE_Y
-		JE NEG_VELOCITY_Y
+		JE X_LEFT_BOUNDARY
 		
 		MOV AX, PLAYER_ONE_Y
 		ADD AX, PLAYER_ONE_HIGHT
 		CMP AX, BALL_Y
-		JE NEG_VELOCITY_Y
-		POP AX
+		JE X_LEFT_BOUNDARY
 		
 		JMP RET_MOVE_BALL
 				
-
+		;If the ball in the same Y point then I need to validate that the ball in the same X range
+		;PLAYER_ONE_X <= BALL_X
+		X_LEFT_BOUNDARY:
+			MOV AX, BALL_X
+			CMP AX, PLAYER_ONE_X         
+			JGE X_RIGHT_BOUNDARY
+			JMP RET_MOVE_BALL
+		;BALL_X+BALL_SIZE <= PLAYER_ONE_X+PLAYER_ONE_WIDTH
+		X_RIGHT_BOUNDARY:
+			MOV BX, PLAYER_ONE_X
+			ADD AX, BALL_SIZE
+			ADD BX, PLAYER_ONE_WIDTH
+			CMP AX, BX
+			JLE NEG_VELOCITY_X
+			JMP RET_MOVE_BALL
+		
 		NEG_VELOCITY_Y:
 			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
 		
 		RET_MOVE_BALL:
 		RET
-		
-		HALT1:         ;WHY?
-		HLT
 		
 	MOVE_BALL ENDP
 	
