@@ -45,10 +45,6 @@
 	MOV DS, AX
 	
 		CALL CLEAR_SCREEN
-		
-		DOWN:
-			MOV AX, 0A0H
-			MOV PLAYER_ONE_Y, AX
 			
 		CHECK_TIME:
 		
@@ -72,10 +68,6 @@
 			CALL DRAW_BALL 
 			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
 			
-			;Reset player position after jump
-			POP DX
-			CMP DELAY_TIME, DL
-			JE DOWN
 			JMP CHECK_TIME ;after everything checks time again
 			
 		;return the control to the dos
@@ -92,13 +84,12 @@
 		;check x
 		
 		;check window
-		MOV AX,
+		MOV AX, BALL_SIZE
 		CMP BALL_X,AX                         
 		JL NEG_VELOCITY_X         ;BALL_X < 0 +  
 		
 		MOV AX,WINDOW_WIDTH
 		SUB AX,BALL_SIZE
-		SUB AX,
 		CMP BALL_X,AX	          ;BALL_X > WINDOW_WIDTH - BALL_SIZE  -  (Y -> collided)
 		JG NEG_VELOCITY_X
 		
@@ -143,9 +134,14 @@
 		CHECK_Y:
 		
 		;check window
-		MOV AX,
+		MOV AX, BALL_SIZE
 		CMP BALL_Y,AX   ;BALL_Y < 0 +  (Y -> collided)
 		JL NEG_VELOCITY_Y                          
+		
+		;check wall y
+		CALL CHECK_WALL_Y
+		CMP AX, 1
+		JE NEG_VELOCITY_Y
 		
 		;check player one playground
 		CALL CHECK_PLAYER_ONE_PLAYGROUND
@@ -295,10 +291,14 @@
 		;READ CHARACTER FROM KEYBOARD
 		mov ah,1
 		int 16h
-		jz DONE
+		JZ DONE1
 		mov ah,0
 		int 16h
 		
+		;down
+		CMP AL, 's'
+		JZ DOWN
+		;Up
 		CMP AL, 'w'
 		JZ Up
 		;Left
@@ -313,9 +313,11 @@
 		Right:         
 			MOV AX,PLAYER_VELOCITY_X
 			ADD PLAYER_ONE_X,AX
+			;avoid crossing the barrier
 			MOV AX, 145
 			CMP PLAYER_ONE_X, AX
 			JG DECREASEX
+			DONE1:
 			RET
 		Left:
 			MOV AX,PLAYER_VELOCITY_X
@@ -325,20 +327,16 @@
 			JL INCREASEX
 			RET
 		Up:
-			;DELAY
-			MOV DELAY_TIME, DL
-			ADD DELAY_TIME, 1
-			;MOD operation
-			MOV AL, DELAY_TIME
-			MOV AH, 0
-			MOV BH, 3CH
-			DIV BH
-			MOV DELAY_TIME, AH
-			
 			MOV AX,PLAYER_VELOCITY_Y
 			SUB PLAYER_ONE_Y,AX
 			CMP PLAYER_ONE_Y, 10
 			JL INCREASEY
+			RET
+		DOWN:
+			MOV AX, PLAYER_VELOCITY_Y
+			ADD PLAYER_ONE_Y,AX
+			CMP PLAYER_ONE_Y, 160
+			JA DECREASEY
 			RET
 		
 		DEFAULT: 
@@ -354,6 +352,9 @@
 			RET
 		INCREASEY: 
 			ADD PLAYER_ONE_Y, AX
+			RET
+		DECREASEY:
+			SUB PLAYER_ONE_Y, AX
 			RET
 			
 		DONE: RET
@@ -371,7 +372,23 @@
 	RETURN:
 	RET 
 	CHECK_WALL_X ENDP
-		
+	
+	
+	CHECK_WALL_Y PROC NEAR
+	MOV AX, 0
+	CMP BALL_X, (WALL_X - BALL_SIZE)
+	JB RET_CHECK_WALL_Y
+	CMP BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE) 
+	JA RET_CHECK_WALL_Y
+	CMP BALL_Y, WALL_Y
+	JB RET_CHECK_WALL_Y
+	CMP BALL_Y, (WALL_Y + BALL_SIZE)
+	JA RET_CHECK_WALL_Y
+	MOV AX, 1
+	RET_CHECK_WALL_Y:
+	RET 
+	CHECK_WALL_Y ENDP
+	
 	CHECK_PLAYER_ONE_PLAYGROUND PROC NEAR
 	MOV AX, 0
 	CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_START
