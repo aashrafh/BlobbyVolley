@@ -26,18 +26,11 @@
 	;player one        
 	PLAYER_ONE_X DW 0H   			;X position of the first player
 	PLAYER_ONE_Y DW 0A0H			;Y position of the first player
-<<<<<<< HEAD
-	PLAYER_ONE_X_SIZE DW 0AH 		;size of the first player in X direction
-	PLAYER_ONE_Y_SIZE DW 14H 		;size of the first player in Y direction
-	PLAYER_VELOCITY_X DW 0AH     	;X (horizontal) velocity of the player
-	PLAYER_VELOCITY_Y DW 0FH      	;Y (vertical) velocity of the player
-	DELAY_TIME DB 0H	  			;A variable to store the end time for the delay period
-	;;;;;;;;;;;;;;;;;
-=======
 	PLAYER_ONE_WIDTH DW 0AH 		;size of the first player in X direction
 	PLAYER_ONE_HIGHT DW 14H 		;size of the first player in Y direction
 	PLAYER_VELOCITY_X DW 0AH      ;X (horizontal) velocity of the player
 	PLAYER_VELOCITY_Y DW 0FH      ;Y (vertical) velocity of the player
+	DELAY_TIME DB 0H	  			;A variable to store the end time for the delay period
 	
 	;player one playground
 	PLAYER_ONE_PLAYGROUND_X_START EQU BALL_SIZE
@@ -45,7 +38,6 @@
 	;player two playground
 	PLAYER_TWO_PLAYGROUND_X_START EQU (WALL_X + WALL_WIDTH + BALL_SIZE)
 	PLAYER_TWO_PLAYGROUND_X_END EQU (WINDOW_WIDTH - BALL_SIZE)
->>>>>>> fdddabd801ae5a30312bdf4a5d0e9112a9dde0d0
 	
 .CODE 
 	MAIN PROC FAR
@@ -353,12 +345,6 @@
 	MOV AX, 1
 	RET_CHECK_PLAYER_TWO_PLAYGROUND:
 	RET 
-<<<<<<< HEAD
-	CHECK_WALL_Y ENDP
-end MAIN 
-=======
 	CHECK_PLAYER_TWO_PLAYGROUND ENDP
 	
-	
-END MAIN 
->>>>>>> fdddabd801ae5a30312bdf4a5d0e9112a9dde0d0
+	END MAIN
