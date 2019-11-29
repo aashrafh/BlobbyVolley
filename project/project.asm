@@ -68,8 +68,8 @@
 			CALL MOVE_BALL
 			
 			CALL DRAW_WALL
-			CALL DRAW_BALL 
 			CALL DRAW_FIRST_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
+			CALL DRAW_BALL 
 			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
 			
 			;Reset player position after jump
@@ -107,6 +107,18 @@
 		CMP AX, 1
 		JE NEG_VELOCITY_X
 		
+		;Check PlayerOne
+		PUSH AX                 ;Just becuase I'm not sure if it will affects something else
+		MOV AX, PLAYER_ONE_WIDTH
+		ADD AX, PLAYER_ONE_X
+		CMP AX, BALL_X
+		JE NEG_VELOCITY_X
+		
+		MOV AX, BALL_X
+		ADD AX, BALL_SIZE
+		CMP AX, PLAYER_ONE_X
+		JE NEG_VELOCITY_X
+		POP AX
 		JMP CHECK_Y
 		
 		NEG_VELOCITY_X:
@@ -129,6 +141,19 @@
 		CMP AX, 1
 		JE NEG_VELOCITY_Y
 		
+		;Check PlayerOne
+		PUSH AX                 ;Just becuase I'm not sure if it will affects something else
+		MOV AX, BALL_Y
+		ADD AX, BALL_SIZE
+		CMP AX, PLAYER_ONE_Y
+		JE NEG_VELOCITY_Y
+		
+		MOV AX, PLAYER_ONE_Y
+		ADD AX, PLAYER_ONE_HIGHT
+		CMP AX, BALL_Y
+		JE NEG_VELOCITY_Y
+		POP AX
+		
 		JMP RET_MOVE_BALL
 				
 
@@ -138,7 +163,7 @@
 		RET_MOVE_BALL:
 		RET
 		
-		HALT1:
+		HALT1:         ;WHY?
 		HLT
 		
 	MOVE_BALL ENDP
