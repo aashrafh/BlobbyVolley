@@ -26,8 +26,9 @@
 	PLAYER_ONE_Y DW 0A0H			;Y position of the first player
 	PLAYER_ONE_X_SIZE DW 0AH 		;size of the first player in X direction
 	PLAYER_ONE_Y_SIZE DW 14H 		;size of the first player in Y direction
-	PLAYER_VELOCITY_X DW 0AH      ;X (horizontal) velocity of the player
-	PLAYER_VELOCITY_Y DW 0FH      ;Y (vertical) velocity of the player
+	PLAYER_VELOCITY_X DW 0AH     	;X (horizontal) velocity of the player
+	PLAYER_VELOCITY_Y DW 0FH      	;Y (vertical) velocity of the player
+	DELAY_TIME DB 0H	  			;A variable to store the end time for the delay period
 	;;;;;;;;;;;;;;;;;
 	
 .CODE 
@@ -37,6 +38,10 @@
 	
 		CALL CLEAR_SCREEN
 		
+		DOWN:
+			MOV AX, 0A0H
+			MOV PLAYER_ONE_Y, AX
+			
 		CHECK_TIME:
 		
 			MOV AH,2Ch ;get the system time
@@ -48,6 +53,8 @@
 			
 			MOV TIME_AUX,DL ;update time
 			
+			PUSH DX
+			
 			CALL CLEAR_SCREEN
 			
 			CALL MOVE_BALL
@@ -55,14 +62,18 @@
 			CALL DRAW_WALL
 			CALL DRAW_BALL 
 			CALL DRAW_FIRST_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
-			CALL MOVE_PLAYER			;get move from the user using the keyboard
+			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
+			
+			;Reset player position after jump
+			POP DX
+			CMP DELAY_TIME, DL
+			JE DOWN
 			JMP CHECK_TIME ;after everything checks time again
 			
 		;return the control to the dos
 		mov ah, 4ch
 		int 21h
 	MAIN ENDP
-	
 	MOVE_BALL PROC NEAR
 		
 		MOV AX,BALL_VELOCITY_X    
@@ -213,13 +224,9 @@
 	
 	MOVE_PLAYER PROC NEAR
 		;READ CHARACTER FROM KEYBOARD
-		 
 		mov ah,1
 		int 16h
 		jz DONE
-		;MOV AH, 01H
-		;INT 21H
-		
 		mov ah,0
 		int 16h
 		
@@ -237,22 +244,31 @@
 		Right:         
 			MOV AX,PLAYER_VELOCITY_X
 			ADD PLAYER_ONE_X,AX
-			MOV AX, 100
+			MOV AX, 145
 			CMP PLAYER_ONE_X, AX
 			JG DECREASEX
 			RET
 		Left:
 			MOV AX,PLAYER_VELOCITY_X
 			SUB PLAYER_ONE_X,AX
-			MOV AX, 5
+			MOV AX, 0
 			CMP PLAYER_ONE_X, AX
 			JL INCREASEX
 			RET
 		Up:
+			;DELAY
+			MOV DELAY_TIME, DL
+			ADD DELAY_TIME, 1
+			;MOD operation
+			MOV AL, DELAY_TIME
+			MOV AH, 0
+			MOV BH, 3CH
+			DIV BH
+			MOV DELAY_TIME, AH
+			
 			MOV AX,PLAYER_VELOCITY_Y
 			SUB PLAYER_ONE_Y,AX
-			MOV AX, 5
-			CMP PLAYER_ONE_Y, AX
+			CMP PLAYER_ONE_Y, 10
 			JL INCREASEY
 			RET
 		
@@ -268,7 +284,6 @@
 			ADD PLAYER_ONE_X, AX
 			RET
 		INCREASEY: 
-			MOV AX, 0AH;
 			ADD PLAYER_ONE_Y, AX
 			RET
 			
@@ -302,5 +317,4 @@
 	RETURN2:
 	RET 
 	CHECK_WALL_Y ENDP
-	
 end MAIN 
