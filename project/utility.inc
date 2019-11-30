@@ -1,0 +1,154 @@
+CLS MACRO
+	MOV AH,00h ;set the configuration to video mode
+	MOV AL,13h ;choose the video mode
+	INT 10h    ;execute the configuration 
+
+	MOV AH,0Bh ;set the configuration
+	MOV BH,00h ;to the background color
+	MOV BL,00h ;choose black as background color
+	INT 10h    ;execute the configuration
+ENDM CLS
+
+MOVE_PLAYER_ONE MACRO
+	;READ CHARACTER FROM KEYBOARD
+	mov ah,1
+	int 16h
+	JZ DONE
+	mov ah,0
+	int 16h
+	
+	;down
+	CMP AL, 's'
+	JZ DOWN
+	;Up
+	CMP AL, 'w'
+	JZ Up
+	;Left
+	CMP AL, 'a'
+	JZ Left
+	;Right
+	CMP AL, 'd'
+	JZ Right
+	
+	JMP DONE ;default
+	;Generate a move to
+	Right:         
+		MOV AX,PLAYER_VELOCITY_X
+		ADD PLAYER_ONE_X,AX
+		;avoid crossing the barrier
+		MOV AX, 145
+		CMP PLAYER_ONE_X, AX
+		JG DECREASEX
+		JMP DONE
+	Left:
+		MOV AX,PLAYER_VELOCITY_X
+		SUB PLAYER_ONE_X,AX
+		MOV AX, 0
+		CMP PLAYER_ONE_X, AX
+		JL INCREASEX
+		JMP DONE
+	Up:
+		MOV AX,PLAYER_VELOCITY_Y
+		SUB PLAYER_ONE_Y,AX
+		CMP PLAYER_ONE_Y, 10
+		JL INCREASEY
+		JMP DONE
+	DOWN:
+		MOV AX, PLAYER_VELOCITY_Y
+		ADD PLAYER_ONE_Y,AX
+		CMP PLAYER_ONE_Y, 160
+		JA DECREASEY
+		JMP DONE
+	
+	DEFAULT: 
+		JMP DONE
+	
+	DECREASEX:
+		MOV AX, 0AH;
+		SUB PLAYER_ONE_X, AX
+		JMP DONE
+	INCREASEX: 
+		MOV AX, 0AH;
+		ADD PLAYER_ONE_X, AX
+		JMP DONE
+	INCREASEY: 
+		ADD PLAYER_ONE_Y, AX
+		JMP DONE
+	DECREASEY:
+		SUB PLAYER_ONE_Y, AX
+		JMP DONE
+		
+	DONE: ;nothing
+ENDM MOVE_PLAYER_ONE
+
+MOVE_PLAYER_TWO MACRO
+	;READ CHARACTER FROM KEYBOARD
+	mov ah,1
+	int 16h
+	JZ DONE
+	mov ah,0
+	int 16h
+	
+	;down
+	CMP AL, 19H
+	JZ DOWN
+	;Up
+	CMP AL, 18H
+	JZ Up
+	;Left
+	CMP AL, 1BH
+	JZ Left
+	;Right
+	CMP AL, 1AH
+	JZ Right
+	
+	JMP DONE  ;default
+	;Generate a move to
+	Right:         
+		MOV AX,PLAYER_VELOCITY_X
+		ADD PLAYER_TWO_X,AX
+		;avoid crossing the barrier
+		MOV AX, 310
+		CMP PLAYER_ONE_X, AX
+		JG DECREASEX
+		JMP DONE
+	Left:
+		MOV AX,PLAYER_VELOCITY_X
+		SUB PLAYER_TWO_X,AX
+		MOV AX, 155
+		CMP PLAYER_ONE_X, AX
+		JL INCREASEX
+		JMP DONE
+	Up:
+		MOV AX,PLAYER_VELOCITY_Y
+		SUB PLAYER_TWO_Y,AX
+		CMP PLAYER_TWO_Y, 10
+		JL INCREASEY
+		JMP DONE
+	DOWN:
+		MOV AX, PLAYER_VELOCITY_Y
+		ADD PLAYER_TWO_Y,AX
+		CMP PLAYER_TWO_Y, 160
+		JA DECREASEY
+		JMP DONE
+	
+	DEFAULT: 
+		JMP DONE
+	
+	DECREASEX:
+		MOV AX, 0AH;
+		SUB PLAYER_TWO_X, AX
+		JMP DONE
+	INCREASEX: 
+		MOV AX, 0AH;
+		ADD PLAYER_TWO_X, AX
+		JMP DONE
+	INCREASEY: 
+		ADD PLAYER_TWO_Y, AX
+		JMP DONE
+	DECREASEY:
+		SUB PLAYER_TWO_Y, AX
+		JMP DONE
+		
+	DONE: ;nothing
+ENDM MOVE_PLAYER_TWO

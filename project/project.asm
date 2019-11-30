@@ -26,10 +26,16 @@
 	;player one        
 	PLAYER_ONE_X DW 0H   			;X position of the first player
 	PLAYER_ONE_Y DW 0A0H			;Y position of the first player
-	PLAYER_ONE_WIDTH DW 0AH 		;size of the first player in X direction
-	PLAYER_ONE_HIGHT DW 20H 		;size of the first player in Y direction
-	PLAYER_VELOCITY_X DW 0AH      ;X (horizontal) velocity of the player
-	PLAYER_VELOCITY_Y DW 0FH      ;Y (vertical) velocity of the player
+	
+	;player two        
+	PLAYER_ONE_X DW 310  			;X position of the second player
+	PLAYER_ONE_Y DW 0A0H			;Y position of the second player
+	
+	;player common attributes
+	PLAYER_WIDTH DW 0AH 			;size of the player in X direction
+	PLAYER_HIGHT DW 20H 			;size of the player in Y direction
+	PLAYER_VELOCITY_X DW 0AH      	;X (horizontal) velocity of the player
+	PLAYER_VELOCITY_Y DW 0FH      	;Y (vertical) velocity of the player
 	
 	;player one playground
 	PLAYER_ONE_PLAYGROUND_X_START EQU BALL_SIZE
@@ -49,7 +55,6 @@
 		
 			MOV AH,2Ch ;get the system time
 			INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
-
 			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
 
 			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
@@ -57,8 +62,6 @@
 			;if it's different, then draw, move, etc.
 			
 			MOV TIME_AUX,DL ;update time
-			
-			PUSH DX
 			
 			CALL CLEAR_SCREEN
 			
