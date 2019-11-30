@@ -27,7 +27,7 @@
 	PLAYER_ONE_X DW 0H   			;X position of the first player
 	PLAYER_ONE_Y DW 0A0H			;Y position of the first player
 	PLAYER_ONE_WIDTH DW 0AH 		;size of the first player in X direction
-	PLAYER_ONE_HIGHT DW 14H 		;size of the first player in Y direction
+	PLAYER_ONE_HIGHT DW 20H 		;size of the first player in Y direction
 	PLAYER_VELOCITY_X DW 0AH      ;X (horizontal) velocity of the player
 	PLAYER_VELOCITY_Y DW 0FH      ;Y (vertical) velocity of the player
 	
@@ -49,7 +49,9 @@
 		
 			MOV AH,2Ch ;get the system time
 			INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
-			
+
+			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
+
 			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
 			JE CHECK_TIME    ;if it is the same, check again
 			;if it's different, then draw, move, etc.
@@ -65,7 +67,6 @@
 			CALL DRAW_WALL
 			CALL DRAW_FIRST_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
 			CALL DRAW_BALL 
-			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
 			
 			JMP CHECK_TIME ;after everything checks time again
 			
@@ -126,6 +127,11 @@
 		
 		;check player two playground
 		CALL CHECK_PLAYER_TWO_PLAYGROUND
+		CMP AX, 1
+		JE NEG_VELOCITY_Y
+		
+		;CHECK_PLAYER_ONE_TOP_Y
+		CALL CHECK_PLAYER_ONE_TOP_Y
 		CMP AX, 1
 		JE NEG_VELOCITY_Y
 		
@@ -390,5 +396,32 @@
 	RET_CHECK_PLAYER_ONE_X:
 	RET 
 	CHECK_PLAYER_ONE_X ENDP
+	
+	CHECK_PLAYER_ONE_TOP_Y PROC NEAR
+	MOV AX, 0
+	MOV DX, PLAYER_ONE_X
+	SUB DX, BALL_SIZE
+	CMP BALL_X, DX
+	JB RET_CHECK_PLAYER_ONE_Y
+	
+	MOV DX, PLAYER_ONE_X
+	ADD DX, PLAYER_ONE_WIDTH
+	ADD DX, BALL_SIZE
+	CMP BALL_X, DX 
+	JA RET_CHECK_PLAYER_ONE_Y
+	
+	MOV DX, PLAYER_ONE_Y
+	CMP BALL_Y, DX
+	JB RET_CHECK_PLAYER_ONE_Y
+	
+	MOV DX, PLAYER_ONE_Y
+	ADD DX, BALL_SIZE
+	CMP BALL_Y, DX
+	JA RET_CHECK_PLAYER_ONE_Y
+	
+	MOV AX, 1
+	RET_CHECK_PLAYER_ONE_Y:
+	RET 
+	CHECK_PLAYER_ONE_TOP_Y ENDP
 	
 	END MAIN
