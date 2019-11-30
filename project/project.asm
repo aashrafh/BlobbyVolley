@@ -50,8 +50,6 @@
 			MOV AH,2Ch ;get the system time
 			INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
 
-			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
-
 			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
 			JE CHECK_TIME    ;if it is the same, check again
 			;if it's different, then draw, move, etc.
@@ -62,6 +60,7 @@
 			
 			CALL CLEAR_SCREEN
 			
+			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
 			CALL MOVE_BALL
 			
 			CALL DRAW_WALL
@@ -101,12 +100,20 @@
 		;CHECK_PLAYER_ONE_X
 		CALL CHECK_PLAYER_ONE_X
 		CMP AX, 1
-		JE NEG_VELOCITY_X
+		JE NEG_VELOCITY_X_PLAYER
 		
 		JMP CHECK_Y
 			
 		NEG_VELOCITY_X:
 			NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
+		
+		JMP CHECK_Y
+
+		NEG_VELOCITY_X_PLAYER:
+		NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
+		MOV AX,BALL_VELOCITY_X    
+		ADD AX, 1
+		ADD BALL_X,AX             ;move the ball horizontally
 		
 		CHECK_Y:
 		
@@ -133,16 +140,24 @@
 		;CHECK_PLAYER_ONE_TOP_Y
 		CALL CHECK_PLAYER_ONE_TOP_Y
 		CMP AX, 1
-		JE NEG_VELOCITY_Y
+		JE NEG_VELOCITY_Y_PLAYER
 		
 		CALL CHECK_PLAYER_ONE_DOWN_Y
 		CMP AX, 1
-		JE NEG_VELOCITY_Y
+		JE NEG_VELOCITY_Y_PLAYER
 		
 		JMP RET_MOVE_BALL
-				
+		
 		NEG_VELOCITY_Y:
 			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
+		
+		JMP RET_MOVE_BALL
+
+		NEG_VELOCITY_Y_PLAYER:
+			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
+			MOV AX, BALL_VELOCITY_Y
+			ADD AX, 1
+			ADD BALL_Y,AX             ;move the ball vertically
 		
 		RET_MOVE_BALL:
 		RET
