@@ -34,10 +34,15 @@
 	;player common attributes
 	PLAYER_X DW ?
 	PLAYER_Y DW ?
-	PLAYER_WIDTH DW 0AH 			;size of the player in X direction
+	PLAYER_WIDTH DW 0FH 			;size of the player in X direction
 	PLAYER_HIGHT DW 20H 			;size of the player in Y direction
-	PLAYER_VELOCITY_X DW 0AH      	;X (horizontal) velocity of the player
-	PLAYER_VELOCITY_Y DW 0FH      	;Y (vertical) velocity of the player
+	PLAYER_VELOCITY_X DW 14H      	;X (horizontal) velocity of the player
+	PLAYER_VELOCITY_Y DW 17H      	;Y (vertical) velocity of the player
+	
+	; PLAYER_WIDTH DW 0AH 			;size of the player in X direction
+	; PLAYER_HIGHT DW 20H 			;size of the player in Y direction
+	; PLAYER_VELOCITY_X DW 0AH      	;X (horizontal) velocity of the player
+	; PLAYER_VELOCITY_Y DW 0FH      	;Y (vertical) velocity of the player
 	
 	;player one playground
 	PLAYER_ONE_PLAYGROUND_X_START EQU BALL_SIZE
@@ -322,6 +327,7 @@
 		
 		JMP DEFAULT         ;If there is no key pressed
 		;Generate a move to
+		
 		Right:         
 			MOV AX,PLAYER_VELOCITY_X
 			ADD PLAYER_ONE_X,AX
@@ -356,11 +362,11 @@
 		
 		;Utilities for collision correction for player one
 		DECREASEX:
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_X;
 			SUB PLAYER_ONE_X, AX
 			RET
 		INCREASEX: 
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_X;
 			ADD PLAYER_ONE_X, AX
 			RET
 		INCREASEY: 
@@ -431,11 +437,11 @@
 		
 		;Utilities for collision correction for player two
 		DECREASEX_2:
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_X;
 			SUB PLAYER_TWO_X, AX
 			JMP DEFAULT_2
 		INCREASEX_2: 
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_X;
 			ADD PLAYER_TWO_X, AX
 			JMP DEFAULT_2
 		INCREASEY_2: 
