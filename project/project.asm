@@ -343,16 +343,16 @@ include utility.inc
 		int 16h
 		
 		;down
-		CMP AL, 'n'
+		CMP AH, 80
 		JZ DOWN_2
 		;Up
-		CMP AL, 'h'
+		CMP AH, 72
 		JZ Up_2
 		;Left
-		CMP AL, 'm'
+		CMP AX, 4B00H
 		JZ Left_2
 		;Right
-		CMP AL, 'b'
+		CMP AH, 77
 		JZ Right_2
 		
 		OTHER:
@@ -369,7 +369,7 @@ include utility.inc
 		Left_2:
 			MOV AX,PLAYER_VELOCITY_X
 			SUB PLAYER_TWO_X,AX
-			MOV AX, 155
+			MOV AX, 150
 			CMP PLAYER_TWO_X, AX
 			JL INCREASEX_2
 			JMP DEFAULT_2
