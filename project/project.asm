@@ -29,7 +29,7 @@ include utility.inc
 	PLAYER_ONE_Y DW 0A0H			;Y position of the first player
 	
 	;player two        
-	PLAYER_TWO_X DW 310  			;X position of the second player
+	PLAYER_TWO_X DW 309			;X position of the second player
 	PLAYER_TWO_Y DW 0A0H			;Y position of the second player
 	
 	;player common attributes
@@ -266,8 +266,8 @@ include utility.inc
 		mov ah,1
 		int 16h
 		JZ DONE1
-		mov ah,0
-		int 16h
+		; mov ah,0
+		; int 16h
 		
 		;down
 		CMP AL, 's'
@@ -343,16 +343,16 @@ include utility.inc
 		int 16h
 		
 		;down
-		CMP AL, 19H
+		CMP AL, 'n'
 		JZ DOWN_2
 		;Up
-		CMP AL, 18H
+		CMP AL, 'h'
 		JZ Up_2
 		;Left
-		CMP AL, 1BH
+		CMP AL, 'm'
 		JZ Left_2
 		;Right
-		CMP AL, 1AH
+		CMP AL, 'b'
 		JZ Right_2
 		
 		OTHER:
