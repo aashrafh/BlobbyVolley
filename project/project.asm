@@ -124,14 +124,14 @@
 		;CHECK_PLAYER_ONE_X
 		MOV AX, PLAYER_ONE_X
 		MOV BX, PLAYER_ONE_Y
-		CALL CHECK_PLAYER_X
+		CALL CHECK_PLAYER_X					;Check collision in the x-axis
 		CMP AX, 1
 		JE NEG_VELOCITY_X_PLAYER
 		
 		;CHECK_PLAYER_TWO_X
 		MOV AX, PLAYER_TWO_X
 		MOV BX, PLAYER_TWO_Y
-		CALL CHECK_PLAYER_X
+		CALL CHECK_PLAYER_X                ;Check collision in the x-axis
 		CMP AX, 1
 		JE NEG_VELOCITY_X_PLAYER
 		
@@ -174,28 +174,28 @@
 		;CHECK_PLAYER_ONE_TOP_Y
 		MOV AX, PLAYER_ONE_X
 		MOV BX, PLAYER_ONE_Y
-		CALL CHECK_PLAYER_TOP_Y
+		CALL CHECK_PLAYER_TOP_Y          ;Check collision in the top y-axis
 		CMP AX, 1
 		JE NEG_VELOCITY_Y_PLAYER
 		
 		;CHECK_PLAYER_ONE_DOWN_Y
 		MOV AX, PLAYER_ONE_X
 		MOV BX, PLAYER_ONE_Y
-		CALL CHECK_PLAYER_DOWN_Y
+		CALL CHECK_PLAYER_DOWN_Y         ;Check collision in the bottom y-axis
 		CMP AX, 1
 		JE NEG_VELOCITY_Y_PLAYER
 		
 		;CHECK_PLAYER_TWO_TOP_Y
 		MOV AX, PLAYER_TWO_X
 		MOV BX, PLAYER_TWO_Y
-		CALL CHECK_PLAYER_TOP_Y
+		CALL CHECK_PLAYER_TOP_Y			 ;Check collision in the top y-axis
 		CMP AX, 1
 		JE NEG_VELOCITY_Y_PLAYER
 		
 		;CHECK_PLAYER_TWO_DOWN_Y
-		MOV AX, PLAYER_TWO_X
+		MOV AX, PLAYER_TWO_X		     
 		MOV BX, PLAYER_TWO_Y
-		CALL CHECK_PLAYER_DOWN_Y
+		CALL CHECK_PLAYER_DOWN_Y	     ;Check collision in the bottom y-axis	
 		CMP AX, 1
 		JE NEG_VELOCITY_Y_PLAYER
 		
@@ -306,8 +306,6 @@
 		mov ah,1
 		int 16h
 		JZ DONE1
-		; mov ah,0
-		; int 16h
 		
 		;down
 		CMP AL, 's'
@@ -322,7 +320,7 @@
 		CMP AL, 'd'
 		JZ Right
 		
-		JMP DEFAULT
+		JMP DEFAULT         ;If there is no key pressed
 		;Generate a move to
 		Right:         
 			MOV AX,PLAYER_VELOCITY_X
@@ -330,7 +328,7 @@
 			;avoid crossing the barrier
 			MOV AX, 145
 			CMP PLAYER_ONE_X, AX
-			JG DECREASEX
+			JG DECREASEX    ;If it above the limits decrease it
 			DONE1:
 			RET
 		Left:
@@ -338,24 +336,25 @@
 			SUB PLAYER_ONE_X,AX
 			MOV AX, 0
 			CMP PLAYER_ONE_X, AX
-			JL INCREASEX
+			JL INCREASEX    ;If it below the limits increase it
 			RET
 		Up:
 			MOV AX,PLAYER_VELOCITY_Y
 			SUB PLAYER_ONE_Y,AX
 			CMP PLAYER_ONE_Y, 10
-			JL INCREASEY
+			JL INCREASEY   ;If it below the limits increase it
 			RET
 		DOWN:
 			MOV AX, PLAYER_VELOCITY_Y
 			ADD PLAYER_ONE_Y,AX
 			CMP PLAYER_ONE_Y, 160
-			JA DECREASEY
+			JA DECREASEY   ;If it above the limits decrease it
 			RET
 		
-		DEFAULT: 
+		DEFAULT:           ;we have nothing to do then return the main loop
 			RET
 		
+		;Utilities for collision correction for player one
 		DECREASEX:
 			MOV AX, 0AH;
 			SUB PLAYER_ONE_X, AX
@@ -382,6 +381,7 @@
 		mov ah,0
 		int 16h
 		
+		;The only difference here is that we compare scan code not ascii code as previouszaq
 		;down
 		CMP AH, 80
 		JZ DOWN_2
@@ -404,31 +404,32 @@
 			;avoid crossing the barrier
 			MOV AX, 310
 			CMP PLAYER_TWO_X, AX
-			JG DECREASEX_2
+			JG DECREASEX_2    ;If it above the limits decrease it
 			JMP DEFAULT_2
 		Left_2:
 			MOV AX,PLAYER_VELOCITY_X
 			SUB PLAYER_TWO_X,AX
 			MOV AX, 150
 			CMP PLAYER_TWO_X, AX
-			JL INCREASEX_2
+			JL INCREASEX_2    ;If it below the limits increase it
 			JMP DEFAULT_2
 		Up_2:
 			MOV AX,PLAYER_VELOCITY_Y
 			SUB PLAYER_TWO_Y,AX
 			CMP PLAYER_TWO_Y, 10
-			JL INCREASEY_2
+			JL INCREASEY_2    ;If it below the limits increase it
 			JMP DEFAULT_2
 		DOWN_2:
 			MOV AX, PLAYER_VELOCITY_Y
 			ADD PLAYER_TWO_Y,AX
 			CMP PLAYER_TWO_Y, 160
-			JA DECREASEY_2
+			JA DECREASEY_2    ;If it above the limits decrease it
 			JMP DEFAULT_2
 		
 		DEFAULT_2: 
 			RET
 		
+		;Utilities for collision correction for player two
 		DECREASEX_2:
 			MOV AX, 0AH;
 			SUB PLAYER_TWO_X, AX
@@ -447,94 +448,100 @@
 			RET
 	MOVE_PLAYER_TWO ENDP
 	
+	;Collision with the wall in the x-axis
 	CHECK_WALL_X PROC NEAR
 		MOV AX, 0
-		CMP BALL_X, (WALL_X - BALL_SIZE)
+		CMP BALL_X, (WALL_X - BALL_SIZE)   ;check collision in the left side
 		JB RETURN
-		CMP BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE) 
+		CMP BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE)   ;check collision in the right side
 		JA RETURN
-		CMP BALL_Y, WALL_Y
+		CMP BALL_Y, WALL_Y                 ;check collision in the top side
 		JB RETURN
-		MOV AX, 1
+		MOV AX, 1  ;there is a collision
 		RETURN:
 		RET 
 	CHECK_WALL_X ENDP
 	
-	
+	;Collision with the wall in the y-axis
 	CHECK_WALL_Y PROC NEAR
 		MOV AX, 0
-		CMP BALL_X, (WALL_X - BALL_SIZE)
+		CMP BALL_X, (WALL_X - BALL_SIZE)   ;check collision in the left side
 		JB RET_CHECK_WALL_Y
-		CMP BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE) 
+		CMP BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE)    ;check collision in the right side
 		JA RET_CHECK_WALL_Y
-		CMP BALL_Y, WALL_Y
+		CMP BALL_Y, WALL_Y                 ;check collision in the top side
 		JB RET_CHECK_WALL_Y
-		CMP BALL_Y, (WALL_Y + BALL_SIZE)
+		CMP BALL_Y, (WALL_Y + BALL_SIZE)   ;check collision in the top side
 		JA RET_CHECK_WALL_Y
-		MOV AX, 1
+		MOV AX, 1  ;there is a collision
 		RET_CHECK_WALL_Y:
 		RET 
 	CHECK_WALL_Y ENDP
 	
-	CHECK_PLAYER_ONE_PLAYGROUND PROC NEAR
+	CHECK_PLAYER_ONE_PLAYGROUND PROC NEAR         ;Check if the second player attack the first player
 		MOV AX, 0
-		CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_START
+		CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_START ;out of the playground
 		JB RET_CHECK_PLAYER_ONE_PLAYGROUND
-		CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_END 
+		CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_END   ;out of the playground
 		JA RET_CHECK_PLAYER_ONE_PLAYGROUND
-		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE)	
-		JB RET_CHECK_PLAYER_ONE_PLAYGROUND
-		MOV AX, 1
+		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE)	  ;if it in the playground but strictly above the ground
+		JB RET_CHECK_PLAYER_ONE_PLAYGROUND        ;then no counted points
+		MOV AX, 1                                 ;there is an attack
 		RET_CHECK_PLAYER_ONE_PLAYGROUND:
 		RET 
 	CHECK_PLAYER_ONE_PLAYGROUND ENDP
 	
-	CHECK_PLAYER_TWO_PLAYGROUND PROC NEAR
+	CHECK_PLAYER_TWO_PLAYGROUND PROC NEAR         ;Check if the first player attack the second player
 		MOV AX, 0
-		CMP BALL_X, PLAYER_TWO_PLAYGROUND_X_START
+		CMP BALL_X, PLAYER_TWO_PLAYGROUND_X_START ;out of the playground
 		JB RET_CHECK_PLAYER_TWO_PLAYGROUND
-		CMP BALL_X, PLAYER_TWO_PLAYGROUND_X_END 
-		JA RET_CHECK_PLAYER_TWO_PLAYGROUND
-		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE)	
-		JB RET_CHECK_PLAYER_TWO_PLAYGROUND
-		MOV AX, 1
+		CMP BALL_X, PLAYER_TWO_PLAYGROUND_X_END   ;out of the playground
+		JA RET_CHECK_PLAYER_TWO_PLAYGROUND 
+		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE)	  ;if it in the playground but strictly above the ground
+		JB RET_CHECK_PLAYER_TWO_PLAYGROUND        ;then no counted points
+		MOV AX, 1                                 ;there is an attack
 		RET_CHECK_PLAYER_TWO_PLAYGROUND:
 		RET 
 	CHECK_PLAYER_TWO_PLAYGROUND ENDP
 	
-	CHECK_PLAYER_X PROC NEAR
-		MOV PLAYER_X, AX
-		MOV PLAYER_Y, BX
-		MOV AX, 0
-		MOV DX, PLAYER_X
+	CHECK_PLAYER_X PROC NEAR    ;Detect collision in the x-axis
+		MOV PLAYER_X, AX 		;X of the specified player (first or second)
+		MOV PLAYER_Y, BX		;Y of the specified player (first or second)
+		MOV AX, 0				;flag
+		;Check collision from left
+		MOV DX, PLAYER_X		
 		SUB DX, BALL_SIZE
-		CMP BALL_X, DX
-		JB RET_CHECK_PLAYER_X
-
+		CMP BALL_X, DX			;If there is a left collision then => BALL_X = PLAYER_X - BALL_SIZE
+		JB RET_CHECK_PLAYER_X   ;Below = far = no collision
+		
+		;Check collision from right
 		MOV DX, PLAYER_X
 		ADD DX, PLAYER_WIDTH	
 		ADD DX, BALL_SIZE
-		CMP BALL_X, DX 
-		JA RET_CHECK_PLAYER_X
+		CMP BALL_X, DX			;If there is a left collision then => BALL_X = PLAYER_X + PLAYER_WIDTH + BALL_SIZE
+		JA RET_CHECK_PLAYER_X   ;Above = far = no collision
 		
+		;If there is a collision in the x-axis then we need one more check
+		;We have to check the y boundaries
 		MOV DX, PLAYER_Y
-		CMP BALL_Y, DX
-		JB RET_CHECK_PLAYER_X
+		CMP BALL_Y, DX			
+		JB RET_CHECK_PLAYER_X	;above the the player = no collision
 		
 		MOV DX, PLAYER_Y
 		ADD DX, PLAYER_HIGHT
 		CMP BALL_Y, DX
-		JA RET_CHECK_PLAYER_X
+		JA RET_CHECK_PLAYER_X 	;below the the player = no collision
 		
-		MOV AX, 1
+		MOV AX, 1				;there is a collision
 		RET_CHECK_PLAYER_X:
 		RET 
 	CHECK_PLAYER_X ENDP
 	
-	CHECK_PLAYER_TOP_Y PROC NEAR
-		MOV PLAYER_X, AX
-		MOV PLAYER_Y, BX
-		MOV AX, 0
+	CHECK_PLAYER_TOP_Y PROC NEAR	;Detect collision in the y-axis from top
+		MOV PLAYER_X, AX			;X of the specified player (first or second)
+		MOV PLAYER_Y, BX			;Y of the specified player (first or second)
+		MOV AX, 0					;flag
+		
 		MOV DX, PLAYER_X
 		SUB DX, BALL_SIZE
 		CMP BALL_X, DX
@@ -555,12 +562,12 @@
 		CMP BALL_Y, DX
 		JA RET_CHECK_PLAYER_TOP_Y
 		
-		MOV AX, 1
+		MOV AX, 1					;there is a collision
 		RET_CHECK_PLAYER_TOP_Y:
 		RET 
 	CHECK_PLAYER_TOP_Y ENDP
 	
-	CHECK_PLAYER_DOWN_Y PROC NEAR
+	CHECK_PLAYER_DOWN_Y PROC NEAR	;Detect collision in the y-axis from top
 		MOV PLAYER_X, AX
 		MOV PLAYER_Y, BX
 		MOV AX, 0
