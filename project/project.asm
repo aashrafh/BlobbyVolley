@@ -1,3 +1,4 @@
+include utility.inc
 .MODEL SMALL
 .STACK 64
 .DATA
@@ -28,10 +29,12 @@
 	PLAYER_ONE_Y DW 0A0H			;Y position of the first player
 	
 	;player two        
-	PLAYER_ONE_X DW 310  			;X position of the second player
-	PLAYER_ONE_Y DW 0A0H			;Y position of the second player
+	PLAYER_TWO_X DW 310  			;X position of the second player
+	PLAYER_TWO_Y DW 0A0H			;Y position of the second player
 	
 	;player common attributes
+	PLAYER_X DW ?
+	PLAYER_Y DW ?
 	PLAYER_WIDTH DW 0AH 			;size of the player in X direction
 	PLAYER_HIGHT DW 20H 			;size of the player in Y direction
 	PLAYER_VELOCITY_X DW 0AH      	;X (horizontal) velocity of the player
@@ -49,13 +52,14 @@
 	MOV AX, @DATA
 	MOV DS, AX
 	
-		CALL CLEAR_SCREEN
+		ClS ;CALL CLEAR_SCREEN
 			
 		CHECK_TIME:
 		
 			MOV AH,2Ch ;get the system time
 			INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
-			CALL MOVE_PLAYER		  ;get move from the user using the keyboard
+			CALL MOVE_PLAYER_ONE		  ;get move from the user using the keyboard
+			CALL MOVE_PLAYER_TWO
 
 			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
 			JE CHECK_TIME    ;if it is the same, check again
@@ -63,13 +67,19 @@
 			
 			MOV TIME_AUX,DL ;update time
 			
-			CALL CLEAR_SCREEN
+			CLS ;CALL CLEAR_SCREEN
 			
-			CALL MOVE_BALL
+			MOVE_BALL ;CALL MOVE_BALL
 			
 			CALL DRAW_WALL
-			CALL DRAW_FIRST_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
-			CALL DRAW_BALL 
+			MOV AX, PLAYER_ONE_X
+			MOV BX, PLAYER_ONE_Y
+			CALL DRAW_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
+			MOV AX, PLAYER_TWO_X
+			MOV BX, PLAYER_TWO_Y
+			CALL DRAW_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
+			
+			DRAW_BALL; CALL DRAW_BALL 
 			
 			JMP CHECK_TIME ;after everything checks time again
 			
@@ -77,121 +87,121 @@
 		MOV AH, 4CH
 		INT 21H
 	MAIN ENDP
-	MOVE_BALL PROC NEAR
+	; MOVE_BALL PROC NEAR
 		
-		MOV AX,BALL_VELOCITY_X    
-		ADD BALL_X,AX             ;move the ball horizontally
-		MOV AX,BALL_VELOCITY_Y
-		ADD BALL_Y,AX             ;move the ball vertically
+		; MOV AX,BALL_VELOCITY_X    
+		; ADD BALL_X,AX             ;move the ball horizontally
+		; MOV AX,BALL_VELOCITY_Y
+		; ADD BALL_Y,AX             ;move the ball vertically
 		
-		;check x
+		; ;check x
 		
-		;check window
-		MOV AX, BALL_SIZE
-		CMP BALL_X,AX                         
-		JL NEG_VELOCITY_X         ;BALL_X < 0   
+		; ;check window
+		; MOV AX, BALL_SIZE
+		; CMP BALL_X,AX                         
+		; JL NEG_VELOCITY_X         ;BALL_X < 0   
 		
-		MOV AX,WINDOW_WIDTH
-		SUB AX,BALL_SIZE
-		CMP BALL_X,AX	          ;BALL_X > WINDOW_WIDTH - BALL_SIZE  -  (Y -> collided)
-		JG NEG_VELOCITY_X
+		; MOV AX,WINDOW_WIDTH
+		; SUB AX,BALL_SIZE
+		; CMP BALL_X,AX	          ;BALL_X > WINDOW_WIDTH - BALL_SIZE  -  (Y -> collided)
+		; JG NEG_VELOCITY_X
 		
-		;check wall
-		CALL CHECK_WALL_X
-		CMP AX, 1
-		JE NEG_VELOCITY_X
+		; ;check wall
+		; CALL CHECK_WALL_X
+		; CMP AX, 1
+		; JE NEG_VELOCITY_X
 		
-		;CHECK_PLAYER_ONE_X
-		CALL CHECK_PLAYER_ONE_X
-		CMP AX, 1
-		JE NEG_VELOCITY_X
+		; ;CHECK_PLAYER_ONE_X
+		; CALL CHECK_PLAYER_ONE_X
+		; CMP AX, 1
+		; JE NEG_VELOCITY_X
 		
-		JMP CHECK_Y
+		; JMP CHECK_Y
 			
-		NEG_VELOCITY_X:
-			NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
+		; NEG_VELOCITY_X:
+			; NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
 		
-		CHECK_Y:
+		; CHECK_Y:
 		
-		;check window
-		MOV AX, BALL_SIZE
-		CMP BALL_Y,AX   ;BALL_Y < 0 +  (Y -> collided)
-		JL NEG_VELOCITY_Y                          
+		; ;check window
+		; MOV AX, BALL_SIZE
+		; CMP BALL_Y,AX   ;BALL_Y < 0 +  (Y -> collided)
+		; JL NEG_VELOCITY_Y                          
 		
-		;check wall y
-		CALL CHECK_WALL_Y
-		CMP AX, 1
-		JE NEG_VELOCITY_Y
+		; ;check wall y
+		; CALL CHECK_WALL_Y
+		; CMP AX, 1
+		; JE NEG_VELOCITY_Y
 		
-		;check player one playground
-		CALL CHECK_PLAYER_ONE_PLAYGROUND
-		CMP AX, 1
-		JE NEG_VELOCITY_Y
+		; ;check player one playground
+		; CALL CHECK_PLAYER_ONE_PLAYGROUND
+		; CMP AX, 1
+		; JE NEG_VELOCITY_Y
 		
-		;check player two playground
-		CALL CHECK_PLAYER_TWO_PLAYGROUND
-		CMP AX, 1
-		JE NEG_VELOCITY_Y
+		; ;check player two playground
+		; CALL CHECK_PLAYER_TWO_PLAYGROUND
+		; CMP AX, 1
+		; JE NEG_VELOCITY_Y
 		
-		;CHECK_PLAYER_ONE_TOP_Y
-		CALL CHECK_PLAYER_ONE_TOP_Y
-		CMP AX, 1
-		JE NEG_VELOCITY_Y
+		; ;CHECK_PLAYER_ONE_TOP_Y
+		; CALL CHECK_PLAYER_ONE_TOP_Y
+		; CMP AX, 1
+		; JE NEG_VELOCITY_Y
 		
-		CALL RET_CHECK_PLAYER_ONE_DOWN_Y
-		CMP AX, 1
-		JE NEG_VELOCITY_Y
+		; CALL RET_CHECK_PLAYER_ONE_DOWN_Y
+		; CMP AX, 1
+		; JE NEG_VELOCITY_Y
 		
-		JMP RET_MOVE_BALL
+		; JMP RET_MOVE_BALL
 				
-		NEG_VELOCITY_Y:
-			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
+		; NEG_VELOCITY_Y:
+			; NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
 		
-		RET_MOVE_BALL:
-		RET
+		; RET_MOVE_BALL:
+		; RET
 		
-	MOVE_BALL ENDP
+	; MOVE_BALL ENDP
 	
-	DRAW_BALL PROC NEAR
+	; DRAW_BALL PROC NEAR
 		
-		MOV CX,BALL_X ;set the initial column (X)
-		MOV DX,BALL_Y ;set the initial line (Y)
+		; MOV CX,BALL_X ;set the initial column (X)
+		; MOV DX,BALL_Y ;set the initial line (Y)
 		
-		DRAW_BALL_HORIZONTAL:
-			MOV AH,0Ch ;set the configuration to writing a pixel
-			MOV AL,0Fh ;choose white as color
-			MOV BH,00h ;set the page number 
-			INT 10h    ;execute the configuration
+		; DRAW_BALL_HORIZONTAL:
+			; MOV AH,0Ch ;set the configuration to writing a pixel
+			; MOV AL,0Fh ;choose white as color
+			; MOV BH,00h ;set the page number 
+			; INT 10h    ;execute the configuration
 			
-			INC CX     ;CX = CX + 1
-			MOV AX,CX          ;CX - BALL_X > BALL_SIZE (Y -> We go to the next line,N -> We continue to the next column
-			SUB AX,BALL_X
-			CMP AX,BALL_SIZE
-			JNG DRAW_BALL_HORIZONTAL
+			; INC CX     ;CX = CX + 1
+			; MOV AX,CX          ;CX - BALL_X > BALL_SIZE (Y -> We go to the next line,N -> We continue to the next column
+			; SUB AX,BALL_X
+			; CMP AX,BALL_SIZE
+			; JNG DRAW_BALL_HORIZONTAL
 			
-			MOV CX,BALL_X ;the CX register goes back to the initial column
-			INC DX        ;we advance one line
+			; MOV CX,BALL_X ;the CX register goes back to the initial column
+			; INC DX        ;we advance one line
 			
-			MOV AX,DX              ;DX - BALL_Y > BALL_SIZE (Y -> we exit this procedure,N -> we continue to the next line
-			SUB AX,BALL_Y
-			CMP AX,BALL_SIZE
-			JNG DRAW_BALL_HORIZONTAL
+			; MOV AX,DX              ;DX - BALL_Y > BALL_SIZE (Y -> we exit this procedure,N -> we continue to the next line
+			; SUB AX,BALL_Y
+			; CMP AX,BALL_SIZE
+			; JNG DRAW_BALL_HORIZONTAL
 		
-		RET
-	DRAW_BALL ENDP
+		; RET
+	; DRAW_BALL ENDP
 	
-	CLEAR_SCREEN PROC NEAR
-			MOV AH,00h ;set the configuration to video mode
-			MOV AL,13h ;choose the video mode
-			INT 10h    ;execute the configuration 
+	; CLEAR_SCREEN PROC NEAR
+			; MOV AH,00h ;set the configuration to video mode
+			; MOV AL,13h ;choose the video mode
+			; INT 10h    ;execute the configuration 
 		
-			MOV AH,0Bh ;set the configuration
-			MOV BH,00h ;to the background color
-			MOV BL,00h ;choose black as background color
-			INT 10h    ;execute the configuration
+			; MOV AH,0Bh ;set the configuration
+			; MOV BH,00h ;to the background color
+			; MOV BL,00h ;choose black as background color
+			; INT 10h    ;execute the configuration
 			
-			RET
-	CLEAR_SCREEN ENDP
+			; RET
+	; CLEAR_SCREEN ENDP
 	
 	DRAW_WALL PROC NEAR
 		
@@ -221,9 +231,11 @@
 		RET
 	DRAW_WALL ENDP
 	
-	DRAW_FIRST_PLAYER PROC NEAR
-		MOV CX, PLAYER_ONE_X	;X = COLUMN
-		MOV DX, PLAYER_ONE_Y	;Y = ROW
+	DRAW_PLAYER PROC NEAR
+		MOV PLAYER_X, AX
+		MOV PLAYER_Y, BX
+		MOV CX, PLAYER_X	;X = COLUMN
+		MOV DX, PLAYER_Y	;Y = ROW
 			
 		Draw:
 			;Write graphics pixel
@@ -234,22 +246,22 @@
 			
 			INC CX 					;CX = CX + 1
 			MOV AX, CX				;TMP FOR THE SUBTRACTION
-			SUB AX, PLAYER_ONE_X  	;AX = AX - PLAYER_ONE_X
-			CMP AX, PLAYER_ONE_WIDTH 	;If AX - PLAYER_ONE_X > PLAYER_ONE_WIDTH
+			SUB AX, PLAYER_X  	;AX = AX - PLAYER_ONE_X
+			CMP AX, PLAYER_WIDTH 	;If AX - PLAYER_ONE_X > PLAYER_ONE_WIDTH
 			JNG Draw 				;Go to the next line if not greater just proceed drawing horizontally
 			
-			MOV CX, PLAYER_ONE_X		;Start drawing from the begining in the second line
+			MOV CX, PLAYER_X		;Start drawing from the begining in the second line
 			INC DX 					;proceed to the next line i.e. DX = DX + 1
 				
 			MOV AX, DX				;TMP FOR THE SUBTRACTION
-			SUB AX, PLAYER_ONE_Y  	;AX = AX - PLAYER_ONE_Y
-			CMP AX, PLAYER_ONE_HIGHT 	;If AX - PLAYER_ONE_Y > PLAYER_ONE_HIGHT
+			SUB AX, PLAYER_Y  	;AX = AX - PLAYER_ONE_Y
+			CMP AX, PLAYER_HIGHT 	;If AX - PLAYER_ONE_Y > PLAYER_ONE_HIGHT
 			JNG Draw 				;exit the proc if not greater just proceed drawing
 			
 		RET
-	DRAW_FIRST_PLAYER ENDP
+	DRAW_PLAYER ENDP
 	
-	MOVE_PLAYER PROC NEAR
+	MOVE_PLAYER_ONE PROC NEAR
 		;READ CHARACTER FROM KEYBOARD
 		mov ah,1
 		int 16h
@@ -320,7 +332,80 @@
 			RET
 			
 		DONE: RET
-	MOVE_PLAYER ENDP
+	MOVE_PLAYER_ONE ENDP
+	
+	MOVE_PLAYER_TWO PROC NEAR
+		;READ CHARACTER FROM KEYBOARD
+		mov ah,1
+		int 16h
+		JZ OTHER
+		mov ah,0
+		int 16h
+		
+		;down
+		CMP AL, 19H
+		JZ DOWN_2
+		;Up
+		CMP AL, 18H
+		JZ Up_2
+		;Left
+		CMP AL, 1BH
+		JZ Left_2
+		;Right
+		CMP AL, 1AH
+		JZ Right_2
+		
+		OTHER:
+			RET  ;default
+		;Generate a move to
+		Right_2:         
+			MOV AX,PLAYER_VELOCITY_X
+			ADD PLAYER_TWO_X,AX
+			;avoid crossing the barrier
+			MOV AX, 310
+			CMP PLAYER_TWO_X, AX
+			JG DECREASEX_2
+			JMP DEFAULT_2
+		Left_2:
+			MOV AX,PLAYER_VELOCITY_X
+			SUB PLAYER_TWO_X,AX
+			MOV AX, 155
+			CMP PLAYER_TWO_X, AX
+			JL INCREASEX_2
+			JMP DEFAULT_2
+		Up_2:
+			MOV AX,PLAYER_VELOCITY_Y
+			SUB PLAYER_TWO_Y,AX
+			CMP PLAYER_TWO_Y, 10
+			JL INCREASEY_2
+			JMP DEFAULT_2
+		DOWN_2:
+			MOV AX, PLAYER_VELOCITY_Y
+			ADD PLAYER_TWO_Y,AX
+			CMP PLAYER_TWO_Y, 160
+			JA DECREASEY_2
+			JMP DEFAULT_2
+		
+		DEFAULT_2: 
+			RET
+		
+		DECREASEX_2:
+			MOV AX, 0AH;
+			SUB PLAYER_TWO_X, AX
+			JMP DEFAULT_2
+		INCREASEX_2: 
+			MOV AX, 0AH;
+			ADD PLAYER_TWO_X, AX
+			JMP DEFAULT_2
+		INCREASEY_2: 
+			ADD PLAYER_TWO_Y, AX
+			JMP DEFAULT_2
+		DECREASEY_2:
+			SUB PLAYER_TWO_Y, AX
+			JMP DEFAULT_2
+		
+			RET
+	MOVE_PLAYER_TWO ENDP
 	
 	CHECK_WALL_X PROC NEAR
 	MOV AX, 0
@@ -385,7 +470,7 @@
 	JB RET_CHECK_PLAYER_ONE_X
 
 	MOV DX, PLAYER_ONE_X
-	ADD DX, PLAYER_ONE_WIDTH	
+	ADD DX, PLAYER_WIDTH	
 	ADD DX, BALL_SIZE
 	CMP BALL_X, DX 
 	JA RET_CHECK_PLAYER_ONE_X
@@ -395,7 +480,7 @@
 	JB RET_CHECK_PLAYER_ONE_X
 	
 	MOV DX, PLAYER_ONE_Y
-	ADD DX, PLAYER_ONE_HIGHT
+	ADD DX, PLAYER_HIGHT
 	CMP BALL_Y, DX
 	JA RET_CHECK_PLAYER_ONE_X
 	
@@ -412,7 +497,7 @@
 	JB RET_CHECK_PLAYER_ONE_TOP_Y
 	
 	MOV DX, PLAYER_ONE_X
-	ADD DX, PLAYER_ONE_WIDTH
+	ADD DX, PLAYER_WIDTH
 	ADD DX, BALL_SIZE
 	CMP BALL_X, DX 
 	JA RET_CHECK_PLAYER_ONE_TOP_Y
@@ -439,19 +524,19 @@
 	JB RET_CHECK_PLAYER_ONE_DOWN_Y
 	
 	MOV DX, PLAYER_ONE_X
-	ADD DX, PLAYER_ONE_WIDTH
+	ADD DX, PLAYER_WIDTH
 	ADD DX, BALL_SIZE
 	CMP BALL_X, DX 
 	JA RET_CHECK_PLAYER_ONE_DOWN_Y
 	
 	MOV DX, PLAYER_ONE_Y
-	ADD DX, PLAYER_ONE_HIGHT
+	ADD DX, PLAYER_HIGHT
 	SUB DX, BALL_SIZE
 	CMP BALL_Y, DX
 	JB RET_CHECK_PLAYER_ONE_DOWN_Y
 	
 	MOV DX, PLAYER_ONE_Y
-	ADD DX, PLAYER_ONE_HIGHT
+	ADD DX, PLAYER_HIGHT
 	CMP BALL_Y, DX
 	JA RET_CHECK_PLAYER_ONE_DOWN_Y
 	

@@ -9,146 +9,101 @@ CLS MACRO
 	INT 10h    ;execute the configuration
 ENDM CLS
 
-MOVE_PLAYER_ONE MACRO
-	;READ CHARACTER FROM KEYBOARD
-	mov ah,1
-	int 16h
-	JZ DONE
-	mov ah,0
-	int 16h
-	
-	;down
-	CMP AL, 's'
-	JZ DOWN
-	;Up
-	CMP AL, 'w'
-	JZ Up
-	;Left
-	CMP AL, 'a'
-	JZ Left
-	;Right
-	CMP AL, 'd'
-	JZ Right
-	
-	JMP DONE ;default
-	;Generate a move to
-	Right:         
-		MOV AX,PLAYER_VELOCITY_X
-		ADD PLAYER_ONE_X,AX
-		;avoid crossing the barrier
-		MOV AX, 145
-		CMP PLAYER_ONE_X, AX
-		JG DECREASEX
-		JMP DONE
-	Left:
-		MOV AX,PLAYER_VELOCITY_X
-		SUB PLAYER_ONE_X,AX
-		MOV AX, 0
-		CMP PLAYER_ONE_X, AX
-		JL INCREASEX
-		JMP DONE
-	Up:
-		MOV AX,PLAYER_VELOCITY_Y
-		SUB PLAYER_ONE_Y,AX
-		CMP PLAYER_ONE_Y, 10
-		JL INCREASEY
-		JMP DONE
-	DOWN:
-		MOV AX, PLAYER_VELOCITY_Y
-		ADD PLAYER_ONE_Y,AX
-		CMP PLAYER_ONE_Y, 160
-		JA DECREASEY
-		JMP DONE
-	
-	DEFAULT: 
-		JMP DONE
-	
-	DECREASEX:
-		MOV AX, 0AH;
-		SUB PLAYER_ONE_X, AX
-		JMP DONE
-	INCREASEX: 
-		MOV AX, 0AH;
-		ADD PLAYER_ONE_X, AX
-		JMP DONE
-	INCREASEY: 
-		ADD PLAYER_ONE_Y, AX
-		JMP DONE
-	DECREASEY:
-		SUB PLAYER_ONE_Y, AX
-		JMP DONE
+MOVE_BALL MACRO
 		
-	DONE: ;nothing
-ENDM MOVE_PLAYER_ONE
+	MOV AX,BALL_VELOCITY_X    
+	ADD BALL_X,AX             ;move the ball horizontally
+	MOV AX,BALL_VELOCITY_Y
+	ADD BALL_Y,AX             ;move the ball vertically
+	
+	;check x
+	
+	;check window
+	MOV AX, BALL_SIZE
+	CMP BALL_X,AX                         
+	JL NEG_VELOCITY_X         ;BALL_X < 0   
+	
+	MOV AX,WINDOW_WIDTH
+	SUB AX,BALL_SIZE
+	CMP BALL_X,AX	          ;BALL_X > WINDOW_WIDTH - BALL_SIZE  -  (Y -> collided)
+	JG NEG_VELOCITY_X
+	
+	;check wall
+	CALL CHECK_WALL_X
+	CMP AX, 1
+	JE NEG_VELOCITY_X
+	
+	;CHECK_PLAYER_ONE_X
+	CALL CHECK_PLAYER_ONE_X
+	CMP AX, 1
+	JE NEG_VELOCITY_X
+	
+	JMP CHECK_Y
+		
+	NEG_VELOCITY_X:
+		NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
+	
+	CHECK_Y:
+	
+	;check window
+	MOV AX, BALL_SIZE
+	CMP BALL_Y,AX   ;BALL_Y < 0 +  (Y -> collided)
+	JL NEG_VELOCITY_Y                          
+	
+	;check wall y
+	CALL CHECK_WALL_Y
+	CMP AX, 1
+	JE NEG_VELOCITY_Y
+	
+	;check player one playground
+	CALL CHECK_PLAYER_ONE_PLAYGROUND
+	CMP AX, 1
+	JE NEG_VELOCITY_Y
+	
+	;check player two playground
+	CALL CHECK_PLAYER_TWO_PLAYGROUND
+	CMP AX, 1
+	JE NEG_VELOCITY_Y
+	
+	;CHECK_PLAYER_ONE_TOP_Y
+	CALL CHECK_PLAYER_ONE_TOP_Y
+	CMP AX, 1
+	JE NEG_VELOCITY_Y
+	
+	CALL RET_CHECK_PLAYER_ONE_DOWN_Y
+	CMP AX, 1
+	JE NEG_VELOCITY_Y
+	
+	JMP RET_MOVE_BALL
+			
+	NEG_VELOCITY_Y:
+		NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
+	
+	RET_MOVE_BALL:
+ENDM MOVE_BALL
 
-MOVE_PLAYER_TWO MACRO
-	;READ CHARACTER FROM KEYBOARD
-	mov ah,1
-	int 16h
-	JZ DONE
-	mov ah,0
-	int 16h
-	
-	;down
-	CMP AL, 19H
-	JZ DOWN
-	;Up
-	CMP AL, 18H
-	JZ Up
-	;Left
-	CMP AL, 1BH
-	JZ Left
-	;Right
-	CMP AL, 1AH
-	JZ Right
-	
-	JMP DONE  ;default
-	;Generate a move to
-	Right:         
-		MOV AX,PLAYER_VELOCITY_X
-		ADD PLAYER_TWO_X,AX
-		;avoid crossing the barrier
-		MOV AX, 310
-		CMP PLAYER_ONE_X, AX
-		JG DECREASEX
-		JMP DONE
-	Left:
-		MOV AX,PLAYER_VELOCITY_X
-		SUB PLAYER_TWO_X,AX
-		MOV AX, 155
-		CMP PLAYER_ONE_X, AX
-		JL INCREASEX
-		JMP DONE
-	Up:
-		MOV AX,PLAYER_VELOCITY_Y
-		SUB PLAYER_TWO_Y,AX
-		CMP PLAYER_TWO_Y, 10
-		JL INCREASEY
-		JMP DONE
-	DOWN:
-		MOV AX, PLAYER_VELOCITY_Y
-		ADD PLAYER_TWO_Y,AX
-		CMP PLAYER_TWO_Y, 160
-		JA DECREASEY
-		JMP DONE
-	
-	DEFAULT: 
-		JMP DONE
-	
-	DECREASEX:
-		MOV AX, 0AH;
-		SUB PLAYER_TWO_X, AX
-		JMP DONE
-	INCREASEX: 
-		MOV AX, 0AH;
-		ADD PLAYER_TWO_X, AX
-		JMP DONE
-	INCREASEY: 
-		ADD PLAYER_TWO_Y, AX
-		JMP DONE
-	DECREASEY:
-		SUB PLAYER_TWO_Y, AX
-		JMP DONE
+DRAW_BALL MACRO
 		
-	DONE: ;nothing
-ENDM MOVE_PLAYER_TWO
+	MOV CX,BALL_X ;set the initial column (X)
+	MOV DX,BALL_Y ;set the initial line (Y)
+	
+	DRAW_BALL_HORIZONTAL:
+		MOV AH,0Ch ;set the configuration to writing a pixel
+		MOV AL,0Fh ;choose white as color
+		MOV BH,00h ;set the page number 
+		INT 10h    ;execute the configuration
+		
+		INC CX     ;CX = CX + 1
+		MOV AX,CX          ;CX - BALL_X > BALL_SIZE (Y -> We go to the next line,N -> We continue to the next column
+		SUB AX,BALL_X
+		CMP AX,BALL_SIZE
+		JNG DRAW_BALL_HORIZONTAL
+		
+		MOV CX,BALL_X ;the CX register goes back to the initial column
+		INC DX        ;we advance one line
+		
+		MOV AX,DX              ;DX - BALL_Y > BALL_SIZE (Y -> we exit this procedure,N -> we continue to the next line
+		SUB AX,BALL_Y
+		CMP AX,BALL_SIZE
+		JNG DRAW_BALL_HORIZONTAL
+ENDM DRAW_BALL
