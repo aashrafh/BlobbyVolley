@@ -1,0 +1,9 @@
+CB   EQU  13   ; color of the ball
+               ; BGC defined back ground color 
+
+
+
+BALL         db BGC ,CB ,CB  ,BGC
+             db CB  ,CB ,CB  , CB
+             db CB  ,CB ,CB  , CB
+             db BGC ,CB ,CB  ,BGC
