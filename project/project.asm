@@ -471,6 +471,7 @@ ENDM DRAW_WALL
 DRAW_PLAYER1 Macro Player
    
     ;pusha
+	
      mov  SI , offset player  
      mov  bh , 0   ;DisplayPage doesn't change	 
      mov  Dx , PLAYER_ONE_Y;start Y for player1
@@ -606,7 +607,7 @@ clear_player2 Macro  X , Y
 EndM clear_player2
 ;-----------------------------------------------------------------------------------	
 
-movePlayer1 Macro
+movePlayer1 PROC NEAR 
     ;pusha
 ;READ CHARACTER FROM KEYBOARD
 		mov ah,1
@@ -706,14 +707,14 @@ movePlayer1 Macro
 			
         DONE:		
 		  clear_player1 OLD_X_Player1 ,OLD_Y_Player1
-		
+		  RET
 		
         DONEALL:
-        mov bl,00
-EndM movePlayer1
+		RET
+movePlayer1 ENDP
 ;-----------------------------------------------------------------------------------	
 
-movePlayer2 Macro
+movePlayer2 PROC NEAR
     ;pusha
 ;READ CHARACTER FROM KEYBOARD
 		mov ah,1
@@ -814,11 +815,11 @@ movePlayer2 Macro
 			
         DONE2:		
 		  clear_player2 OLD_X_Player2 ,OLD_Y_Player2
-		
+		  RET 
 		
         DONEALL2:
-        mov bl,00
-EndM movePlayer2
+        RET
+movePlayer2 ENDP
 ;---------------------------------------------------------------------------	
 	;Collision with the wall in the x-axis
 	CHECK_WALL_X PROC NEAR
@@ -1016,8 +1017,8 @@ MAIN PROC FAR
 			DRAW_PLAYER2 PLAYER2
 			
 			; Move Players
-			movePlayer1  ;move for player1 
-			movePlayer2  ;move for player2 
+			CALL movePlayer1  ;move for player1 
+			CALL movePlayer2  ;move for player2 
 			
 			; Move BALL and Draw it
 			CLEAR_BALL BGC       ;clear old poition / Cyan
