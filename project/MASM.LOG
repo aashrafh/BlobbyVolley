@@ -194,11 +194,19 @@ project.ASM(1158): error A2010: Syntax error
                                 >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
 project.ASM(1162): warning A4001: Extra characters on line
 
+<<<<<<< HEAD
    1231 Source  Lines
    1547 Total   Lines
     146 Symbols
 
   51540 + 407644 Bytes symbol space free
+=======
+    601 Source  Lines
+    601 Total   Lines
+     96 Symbols
+
+  51542 + 448618 Bytes symbol space free
+>>>>>>> ea106fcc2043aef8c27b959a5c4adbf169f0aad5
 
      24 Warning Errors
      72 Severe  Errors
