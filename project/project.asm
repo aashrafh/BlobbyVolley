@@ -15,8 +15,6 @@ include test.inc
 ;------------------------------------------------------------------------	
 	BALL_X DW 170 ;X start position (column) of the ball 
 	BALL_Y DW 100 ;Y start position (line) of the ball
-	OLD_BALL_X DW 00
-	OLD_BALL_Y DW 00
 	BALL_SIZE EQU 04 ;size of the ball (how many pixels does the ball have in width and height)
 	
 	;both must be less than ball size
@@ -247,14 +245,7 @@ INITIALIZE_SCREEN  ENDP
 ;----------------------------Moving the ball and its collision detection------------------------------------------	
 	MOVE_BALL PROC NEAR
 		
-		MOV AX ,BALL_X      ; fetch the old position of the ball in x
-		MOV [OLD_BALL_X],AX
-		
-		
-		MOV AX ,BALL_Y      ; fetch the old position of the ball in Y
-		MOV [OLD_BALL_Y],AX
-		
-		
+	
 		MOV AX,BALL_VELOCITY_X    
 		ADD BALL_X,AX             ;move the ball horizontally
 		MOV AX,BALL_VELOCITY_Y
@@ -787,7 +778,7 @@ MAIN PROC FAR
 			CALL movePlayer2  ;move for player2 
 			
 			; Move BALL and Draw it
-			CLEAR BGC, OLD_BALL_X, OLD_BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
+			CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
 			CALL MOVE_BALL
 		    DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		; CALL DRAW_BALL / yellow              
 			
