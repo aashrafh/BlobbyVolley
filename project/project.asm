@@ -139,7 +139,7 @@ WALL                db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BL
 	;player 1        
 	
 	PLAYER_ONE_X DW 31   			;X position of the first player
-	PLAYER_ONE_Y DW 178			;Y position of the first player
+	PLAYER_ONE_Y DW 138			;Y position of the first player
     OLD_X_Player1 DW 00
 	OLD_Y_Player1 DW 00 
 	
@@ -172,7 +172,7 @@ WALL                db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BL
 	;player 2        
 	
 	PLAYER_TWO_X DW  271			;X position of the second player
-	PLAYER_TWO_Y DW  178			;Y position of the second player
+	PLAYER_TWO_Y DW  138			;Y position of the second player
 	OLD_X_Player2 DW 00
 	OLD_Y_Player2 DW 00 
     
@@ -781,7 +781,7 @@ movePlayer2 Macro
             
 			MOV AX, PLAYER_VELOCITY_Y
 			ADD PLAYER_TWO_Y,AX
-			CMP PLAYER_TWO_Y, 120
+			CMP PLAYER_TWO_Y, 160
 			JA DECREASEY2
 			
 			
