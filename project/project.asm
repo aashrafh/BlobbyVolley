@@ -26,6 +26,114 @@
 	WALL_WIDTH EQU 10
 	WALL_WIDTH_HALF EQU 5
 	WALL_HIGHT EQU 100
+	BLACK               EQU         00h
+    BROWN               EQU         06h
+   
+
+WALL                db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                   
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN,BROWN , BROWN, BROWN, BLACK, BLACK, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN  
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                   
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN,BROWN , BROWN, BROWN, BLACK, BLACK, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN  
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN 
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                        
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN 
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
+                    db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
 
 ;-------------------------------------------------------------------------	
 	;player 1        
@@ -326,33 +434,37 @@ ENDM DRAW_BALL
 	MOVE_BALL ENDP
 ;---------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------	
-	DRAW_WALL PROC NEAR
-		
-		MOV CX,WALL_X ;set the initial column (X)
-		MOV DX,WALL_Y ;set the initial line (Y)
-		
-		DRAW_WALL_HORIZONTAL:
-			MOV AH,0Ch ;set the configuration to writing a pixel
-			MOV AL,0Fh ;choose white as color
-			MOV BH,00h ;set the page number 
-			INT 10h    ;execute the configuration
+DRAW_WALL MACRO 
+	 mov  SI , offset WALL
+     mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , WALL_Y;start Y for WALL
+	
+	 mov  DI , WALL_WIDTH
+	 add  DI , WALL_X
+	 sub  DI  ,1
+	 
+     mov  BX , WALL_HIGHT ; limit for y
+     add  BX , WALL_Y	 
+     Sub  BX , 1  
+     ;Draw player1
+	
+ outerloopWALL :
+     mov cx,WALL_X ;start x for WALL
+    
+	 innerloopWALL :	 
+			mov al ,[SI] ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			inc SI
+			cmp cx , DI ;the end X for WALL
+			jbe innerloopWALL
 			
-			INC CX     ;CX = CX + 1
-			MOV AX,CX          ;CX - WALL_X > WALL_SIZE (Y -> We go to the next line,N -> We continue to the next column
-			SUB AX,WALL_X
-			CMP AX,WALL_WIDTH
-			JNG DRAW_WALL_HORIZONTAL
-			
-			MOV CX,WALL_X ;the CX register goes back to the initial column
-			INC DX        ;we advance one line
-			
-			MOV AX,DX              ;DX - WALL_Y > WALL_SIZE (Y -> we exit this procedure,N -> we continue to the next line
-			SUB AX,WALL_Y
-			CMP AX,WALL_HIGHT
-			JNG DRAW_WALL_HORIZONTAL
+        inc dx
+        cmp dx  ,BX ; the end Y for WALL
+        jbe  outerloopWALL	
 		
-		RET
-	DRAW_WALL ENDP
+ENDM DRAW_WALL 
 ;------------------------------------------------------------------------------------	
 ;------------------------------------------------------------------------------------
 DRAW_PLAYER1 Macro Player
@@ -890,30 +1002,23 @@ MAIN PROC FAR
 			
 			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
 			JE CHECK_TIME    ;if it is the same, check again
-			;if it's different, then draw, move, etc.
+			                 ;if it's different, then draw, move, etc.
 			
 			MOV TIME_AUX,DL ;update time
 			
-			;CALL CLS ;CALL CLEAR_SCREEN
 			
+			;DRAW the Wall
+		    DRAW_WALL     ;Macro to draw wall
 			
-			CALL DRAW_WALL
-			
-			;MOV AX, PLAYER_ONE_X
-			;MOV BX, PLAYER_ONE_Y
-			DRAW_PLAYER1 PLAYER1    ;NOTE: this proc affects the flag registers, BE CAREFULL 
+			; Draw Players 
+			DRAW_PLAYER1 PLAYER1    
 			DRAW_PLAYER2 PLAYER2
-			;MOV AX, PLAYER_TWO_X
-			;MOV BX, PLAYER_TWO_Y
-			;CALL DRAW_PLAYER    ;NOTE: this proc affects the flag registers, BE CAREFULL 
 			
-			
-		
-			
+			; Move Players
 			movePlayer1  ;move for player1 
 			movePlayer2  ;move for player2 
 			
-			
+			; Move BALL and Draw it
 			CLEAR_BALL 11        ;clear old poition / Cyan
 			CALL MOVE_BALL
 		    DRAW_BALL 13		; CALL DRAW_BALL / yellow              
