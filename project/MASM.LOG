@@ -1,12 +1,204 @@
 Microsoft (R) Macro Assembler Version 5.00 
 Copyright (C) Microsoft Corp 1981-1985, 1987.  All rights reserved.
 
+                                	PLAYER1 DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 
+project.ASM(225): error A2004: Redefinition of symbol
+ 010F                           	PLAYER_TWO_X DW  271			;X position of the second player 
+project.ASM(253): error A2004: Redefinition of symbol
+ 008A                           	PLAYER_TWO_Y DW  138			;Y position of the second player 
+project.ASM(254): error A2004: Redefinition of symbol
+ 0000                           	OLD_X_Player2 DW 00 
+project.ASM(255): error A2004: Redefinition of symbol
+ 0000                           	OLD_Y_Player2 DW 00  
+project.ASM(256): error A2004: Redefinition of symbol
+                                	PLAYER2 DB  11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11 , 11 
+project.ASM(258): error A2004: Redefinition of symbol
+                                <<<<<<< HEAD 
+project.ASM(12): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(14): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(15): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(144): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(155): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(156): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(164): warning A4001: Extra characters on line
+ 040D  0B 0B 0B 0B 0B 0B 0B     	PLAYER1 DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 
+project.ASM(166): error A2005: Symbol is multidefined: PLAYER1
+ 010F                           	PLAYER_TWO_X DW  271			;X position of the second player 
+project.ASM(194): error A2005: Symbol is multidefined: PLAYER_TWO_X
+ 008A                           	PLAYER_TWO_Y DW  138			;Y position of the second player 
+project.ASM(195): error A2005: Symbol is multidefined: PLAYER_TWO_Y
+ 0000                           	OLD_X_Player2 DW 00 
+project.ASM(196): error A2005: Symbol is multidefined: OLD_X_PLAYER2
+ 0000                           	OLD_Y_Player2 DW 00  
+project.ASM(197): error A2005: Symbol is multidefined: OLD_Y_PLAYER2
+ 05E1  0B 0B 0B 0B 00 00 00     	PLAYER2 DB  11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11 , 11 
+project.ASM(199): error A2005: Symbol is multidefined: PLAYER2
+                                ======= 
+project.ASM(223): error A2010: Syntax error
+ 07AD  0B 0B 0B 0B 0B 0B 0B     	PLAYER1 DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 
+project.ASM(225): error A2005: Symbol is multidefined: PLAYER1
+ 010F                           	PLAYER_TWO_X DW  271			;X position of the second player 
+project.ASM(253): error A2005: Symbol is multidefined: PLAYER_TWO_X
+ 008A                           	PLAYER_TWO_Y DW  138			;Y position of the second player 
+project.ASM(254): error A2005: Symbol is multidefined: PLAYER_TWO_Y
+ 0000                           	OLD_X_Player2 DW 00 
+project.ASM(255): error A2005: Symbol is multidefined: OLD_X_PLAYER2
+ 0000                           	OLD_Y_Player2 DW 00  
+project.ASM(256): error A2005: Symbol is multidefined: OLD_Y_PLAYER2
+ 0981  0B 0B 0B 0B 00 00 00     	PLAYER2 DB  11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11 , 11 
+project.ASM(258): error A2005: Symbol is multidefined: PLAYER2
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(282): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(301): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(316): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(405): warning A4001: Extra characters on line
+ 0061  A1 05D9 R                		MOV AX, PLAYER_TWO_X 
+project.ASM(446): error A2026: Reference to multidefined symbol
+ 0064  8B 1E 05DB R             		MOV BX, PLAYER_TWO_Y 
+project.ASM(447): error A2026: Reference to multidefined symbol
+ 00C7  A1 05D9 R                		MOV AX, PLAYER_TWO_X 
+project.ASM(503): error A2026: Reference to multidefined symbol
+ 00CA  8B 1E 05DB R             		MOV BX, PLAYER_TWO_Y 
+project.ASM(504): error A2026: Reference to multidefined symbol
+ 00D6  A1 05D9 R                		MOV AX, PLAYER_TWO_X		      
+project.ASM(510): error A2026: Reference to multidefined symbol
+ 00D9  8B 1E 05DB R             		MOV BX, PLAYER_TWO_Y 
+project.ASM(511): error A2026: Reference to multidefined symbol
+                                <<<<<<< HEAD 
+project.ASM(532): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(533): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(706): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(715): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(718): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(721): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(813): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(815): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(817): warning A4001: Extra characters on line
+ 0207  8B 36 05D9 R             	    mov SI , PLAYER_TWO_X 
+project.ASM(834): error A2026: Reference to multidefined symbol
+ 020B  8B 3E 05DB R             		mov DI , PLAYER_TWO_Y 
+project.ASM(835): error A2026: Reference to multidefined symbol
+ 020F  89 36 05DD R             		mov [OLD_X_Player2],SI 
+project.ASM(837): error A2026: Reference to multidefined symbol
+ 0213  89 3E 05DF R             		mov [OLD_Y_Player2],DI 
+project.ASM(838): error A2026: Reference to multidefined symbol
+                                <<<<<<< HEAD 
+project.ASM(853): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(857): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(861): warning A4001: Extra characters on line
+ 0234  01 06 05D9 R             			ADD PLAYER_TWO_X,AX 
+project.ASM(868): error A2026: Reference to multidefined symbol
+ 023B  39 06 05D9 R             			CMP PLAYER_TWO_X, AX 
+project.ASM(871): error A2026: Reference to multidefined symbol
+ 0247  29 06 05D9 R             			SUB PLAYER_TWO_X,AX 
+project.ASM(880): error A2026: Reference to multidefined symbol
+ 024E  39 06 05D9 R             			CMP PLAYER_TWO_X, AX 
+project.ASM(882): error A2026: Reference to multidefined symbol
+ 025A  29 06 05DB R             			SUB PLAYER_TWO_Y,AX 
+project.ASM(890): error A2026: Reference to multidefined symbol
+ 025E  83 3E 05DB R 0A          			CMP PLAYER_TWO_Y, 10 
+project.ASM(891): error A2026: Reference to multidefined symbol
+ 026B  01 06 05DB R             			ADD PLAYER_TWO_Y,AX 
+project.ASM(899): error A2026: Reference to multidefined symbol
+ 026F  81 3E 05DB R 00A0        			CMP PLAYER_TWO_Y, 160 
+project.ASM(900): error A2026: Reference to multidefined symbol
+ 0280  29 06 05D9 R             			SUB PLAYER_TWO_X, AX 
+project.ASM(911): error A2026: Reference to multidefined symbol
+ 028A  01 06 05D9 R             			ADD PLAYER_TWO_X, AX 
+project.ASM(917): error A2026: Reference to multidefined symbol
+ 0291  01 06 05DB R             			ADD PLAYER_TWO_Y, AX 
+project.ASM(922): error A2026: Reference to multidefined symbol
+ 0298  29 06 05DB R             			SUB PLAYER_TWO_Y, AX 
+project.ASM(926): error A2026: Reference to multidefined symbol
+                                <<<<<<< HEAD 
+project.ASM(931): warning A4001: Extra characters on line
+ 02A1  8B 16 05DF R          1  mov  Dx , OLD_Y_Player2 ; 
+project.ASM(932): error A2026: Reference to multidefined symbol
+ 02A5  8B 3E 05DD R          1  mov  DI , OLD_X_Player2; 
+project.ASM(932): error A2026: Reference to multidefined symbol
+ 02B0  8B 1E 05DF R          1  mov  BX , OLD_Y_Player2	 ; 
+project.ASM(932): error A2026: Reference to multidefined symbol
+ 02BB  8B 0E 05DD R          1  mov cx , OLD_X_Player2 ; 
+project.ASM(932): error A2026: Reference to multidefined symbol
+                                ======= 
+project.ASM(933): error A2010: Syntax error
+ 02D2  8B 16 05DF R          1  mov  Dx , OLD_Y_Player2 ; 
+project.ASM(934): error A2026: Reference to multidefined symbol
+ 02DA  03 3E 05DD R          1  add  DI , OLD_X_Player2 
+project.ASM(934): error A2026: Reference to multidefined symbol
+ 02E5  03 1E 05DF R          1  add  BX , OLD_Y_Player2 
+project.ASM(934): error A2026: Reference to multidefined symbol
+ 02EC  8B 0E 05DD R          1  mov cx , OLD_X_Player2 ; 
+project.ASM(934): error A2026: Reference to multidefined symbol
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(935): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(1115): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(1117): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(1119): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(1135): warning A4001: Extra characters on line
+ 04AE  BE 040D R             1  mov  SI , offset PLAYER1 
+project.ASM(1139): error A2026: Reference to multidefined symbol
+ 04E2  BE 05E1 R             1  mov  SI , offset PLAYER2 
+project.ASM(1140): error A2026: Reference to multidefined symbol
+ 04E7  8B 16 05DB R          1  mov  Dx , PLAYER_TWO_Y; 
+project.ASM(1140): error A2026: Reference to multidefined symbol
+ 04EF  03 3E 05D9 R          1  add  DI , PLAYER_TWO_X 
+project.ASM(1140): error A2026: Reference to multidefined symbol
+ 04FA  03 1E 05DB R          1  add  BX , PLAYER_TWO_Y 
+project.ASM(1140): error A2026: Reference to multidefined symbol
+ 0501  8B 0E 05D9 R          1  mov cx, PLAYER_TWO_X ; 
+project.ASM(1140): error A2026: Reference to multidefined symbol
+                                ======= 
+project.ASM(1141): error A2010: Syntax error
+ 0546  BE 040D R             1  mov  SI , offset PLAYER1 
+project.ASM(1145): error A2026: Reference to multidefined symbol
+ 057A  BE 05E1 R             1  mov  SI , offset PLAYER2 
+project.ASM(1146): error A2026: Reference to multidefined symbol
+ 057F  8B 16 05DB R          1  mov  Dx , PLAYER_TWO_Y; 
+project.ASM(1146): error A2026: Reference to multidefined symbol
+ 0587  03 3E 05D9 R          1  add  DI , PLAYER_TWO_X 
+project.ASM(1146): error A2026: Reference to multidefined symbol
+ 0592  03 1E 05DB R          1  add  BX , PLAYER_TWO_Y 
+project.ASM(1146): error A2026: Reference to multidefined symbol
+ 0599  8B 0E 05D9 R          1  mov cx,PLAYER_TWO_x ; 
+project.ASM(1146): error A2026: Reference to multidefined symbol
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(1147): warning A4001: Extra characters on line
+                                <<<<<<< HEAD 
+project.ASM(1154): warning A4001: Extra characters on line
+                                ======= 
+project.ASM(1158): error A2010: Syntax error
+                                >>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db 
+project.ASM(1162): warning A4001: Extra characters on line
 
-    861 Source  Lines
-   1014 Total   Lines
-    123 Symbols
+   1231 Source  Lines
+   1547 Total   Lines
+    146 Symbols
 
-  51540 + 415852 Bytes symbol space free
+  51540 + 407644 Bytes symbol space free
 
-      0 Warning Errors
-      0 Severe  Errors
+     24 Warning Errors
+     72 Severe  Errors

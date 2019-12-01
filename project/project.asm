@@ -9,7 +9,10 @@ include test.inc
 	WINDOW_HEIGHT EQU 200  ;the height of the window (200 pixels)
 	WINDOW_HALF_HEIGHT EQU 100  	
 	BGC EQU 11 ;Light Cyan
+<<<<<<< HEAD
 	
+=======
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 ;------------------------------------------------------------------------	
 	TIME_AUX DB 0 ;variable used when checking if the time has changed
 ;------------------------------------------------------------------------	
@@ -138,6 +141,7 @@ WALL                db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BL
                     db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
                     db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
 
+<<<<<<< HEAD
 CB   EQU  13   ; color of the ball
                ; BGC defined back ground color 
 
@@ -148,6 +152,8 @@ BALL         db BGC ,CB ,CB  ,BGC
              db CB  ,CB ,CB  , CB
              db BGC ,CB ,CB  ,BGC
 			 
+=======
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 ;-------------------------------------------------------------------------	
 	;player 1        
 	
@@ -155,6 +161,7 @@ BALL         db BGC ,CB ,CB  ,BGC
 	PLAYER_ONE_Y DW 138			;Y position of the first player
     OLD_X_Player1 DW 00
 	OLD_Y_Player1 DW 00 
+<<<<<<< HEAD
 	
 	PLAYER1 DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11
 			DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11
@@ -213,6 +220,66 @@ BALL         db BGC ,CB ,CB  ,BGC
 			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 00 , 00 , 00 , 12 , 12 , 00
 			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00
 	
+=======
+	
+	PLAYER1 DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 00 , 10 , 00 , 00 , 00 , 00 , 00 , 10 , 00 , 00 , 00 , 00 , 10 , 10 , 00
+			DB  11 , 11 , 11 , 11 , 11 , 00 , 10 , 00 , 00 , 00 , 00 , 00 , 10 , 00 , 00 , 00 , 00 , 10 , 10 , 00
+			DB  11 , 11 , 11 , 11 , 11 , 00 , 10 , 10 , 10 , 00 , 10 , 10 , 10 , 10 , 00 , 00 , 10 , 10 , 10 , 00
+			DB  11 , 11 , 11 , 11 , 11 , 00 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 00
+			DB  11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 14 , 14 , 14 , 14 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 14 , 14 , 14 , 14 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 14 , 14 , 00 , 14 , 00 , 00 , 14 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 10 , 10 , 10 , 14 , 14 , 14 , 14 , 00 , 00 , 14 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 10 , 10 , 10 , 10 , 10 , 14 , 14 , 14 , 14 , 14 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 10 , 10 , 10 , 10 , 10 , 14 , 14 , 14 , 14 , 14 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 00 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 00 , 00 , 11
+			DB  11 , 11 , 11 , 00 , 00 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 00 , 00 , 00 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 00 , 00 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 10 , 00 , 00 , 00 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 00 , 00 , 10 , 10 , 10 , 10 , 10 , 00 , 00 , 00 , 00 , 10 , 10 , 00 , 11 , 11 , 11
+			DB  11 , 11 , 00 , 10 , 10 , 10 , 10 , 14 , 14 , 14 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11
+			DB  11 , 11 , 00 , 10 , 10 , 10 , 10 , 14 , 14 , 14 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 11 , 00 , 10 , 10 , 10 , 10 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  00 , 00 , 10 , 10 , 10 , 10 , 00 , 00 , 00 , 10 , 10 , 10 , 10 , 10 , 00 , 00 , 11 , 11 , 11 , 11
+			DB  00 , 10 , 10 , 00 , 00 , 00 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11  
+	
+	
+;------------------------------------------------------------------------	
+	;player 2        
+	
+	PLAYER_TWO_X DW  271			;X position of the second player
+	PLAYER_TWO_Y DW  138			;Y position of the second player
+	OLD_X_Player2 DW 00
+	OLD_Y_Player2 DW 00 
+    
+	PLAYER2 DB  11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  00 , 12 , 12 , 00 , 00 , 00 , 00 , 12 , 00 , 00 , 00 , 00 , 00 , 12 , 00 , 11 , 11 , 11 , 11 , 11
+			DB  00 , 12 , 12 , 00 , 00 , 00 , 00 , 12 , 00 , 00 , 00 , 00 , 00 , 12 , 00 , 11 , 11 , 11 , 11 , 11
+			DB  00 , 12 , 12 , 12 , 00 , 00 , 12 , 12 , 12 , 12 , 00 , 12 , 12 , 12 , 00 , 11 , 11 , 11 , 11 , 11
+			DB  00 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 00 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 14 , 14 , 14 , 14 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 14 , 14 , 14 , 14 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 14 , 00 , 00 , 14 , 00 , 14 , 14 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 14 , 00 , 00 , 14 , 14 , 14 , 14 , 12 , 12 , 12 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 14 , 14 , 14 , 14 , 14 , 12 , 12 , 12 , 12 , 12 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 14 , 14 , 14 , 14 , 14 , 12 , 12 , 12 , 12 , 12 , 00 , 11 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 00 , 00 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 00 , 11 , 11 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 00 , 00 , 00 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 00 , 00 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 00 , 00 , 00 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 12 , 00 , 00 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 00 , 12 , 12 , 00 , 00 , 00 , 00 , 12 , 12 , 12 , 12 , 12 , 00 , 00 , 11 , 11 , 11
+			DB  11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 14 , 14 , 14 , 12 , 12 , 12 , 12 , 00 , 11 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 14 , 14 , 14 , 12 , 12 , 12 , 12 , 00 , 11 , 11
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 12 , 12 , 12 , 12 , 00 , 11 , 11
+			DB  11 , 11 , 11 , 11 , 00 , 00 , 12 , 12 , 12 , 12 , 12 , 00 , 00 , 00 , 12 , 12 , 12 , 12 , 00 , 00
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 00 , 00 , 00 , 12 , 12 , 00
+			DB  11 , 11 , 11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00
+	
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 	
 ;-------------------------------------------------------------------------	
 	;player common attributes
@@ -231,6 +298,7 @@ BALL         db BGC ,CB ,CB  ,BGC
 	PLAYER_TWO_PLAYGROUND_X_END EQU (WINDOW_WIDTH - BALL_SIZE)
 ;--------------------------------------------------------------------------	
 .CODE
+<<<<<<< HEAD
 
 ;------------------------------set the background color--------------------------------------------
 INITIALIZE_SCREEN PROC
@@ -245,6 +313,96 @@ INITIALIZE_SCREEN PROC
 INITIALIZE_SCREEN  ENDP
 
 ;----------------------------Moving the ball and its collision detection------------------------------------------	
+=======
+
+;--------------------------------------------------------------------------
+intilaize_screen Macro color
+  
+    MOV AH, 06h    ; Scroll up function
+	XOR AL, AL     ; Clear entire screen
+	XOR CX, CX     ; Upper left corner CH=row, CL=column
+	MOV DX, 184FH  ; lower right corner DH=row, DL=column 
+	MOV BH, color     ; color 
+	INT 10H
+  
+EndM intilaize_screen 
+	
+;--------------------------------------------------------------------------
+
+CLEAR_BALL MACRO color
+  
+     
+	 mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , OLD_BALL_Y ;start Y for player1
+	
+	
+	 mov  DI , OLD_BALL_X; limit for x
+	 add  DI , BALL_SIZE 
+	 sub  DI , 1
+	 
+     mov  BX , OLD_BALL_Y	 ; limit for y
+     add  BX , BALL_SIZE
+     Sub  BX , 1
+outerloopclear_Ball :
+       mov cx , OLD_BALL_X ;start x for player1
+	   
+	innerloopclear_Ball :	 
+			mov al , color ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			cmp cx ,DI ;the end X for Ball
+			jbe innerloopclear_Ball
+			
+        inc dx
+        cmp dx  ,BX ; the end Y for player1
+        jbe  outerloopclear_Ball
+     
+    
+EndM CLEAR_BALL
+;-------------------------------------------------------------------------
+DRAW_BALL MACRO color
+		
+	 mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , BALL_Y ;start Y for Ball
+	
+	
+	 mov  DI , BALL_X    ; limit for x
+	 add  DI , BALL_SIZE 
+	 sub  DI , 1
+	 
+     mov  BX , BALL_Y	 ; limit for y
+     add  BX , BALL_SIZE
+     Sub  BX , 1
+outerloop_DrawBall :
+       mov cx , BALL_X ;start x for player1
+	   
+	innerloop_DrawBall :	 
+			mov al , color ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			cmp cx ,DI ;the end X for Ball
+			jbe innerloop_DrawBall
+			
+        inc dx
+        cmp dx  ,BX ; the end Y for Ball
+        jbe  outerloop_DrawBall
+    
+ENDM DRAW_BALL
+;-------------------------------------------------------------------------
+ 	CLS PROC NEAR
+		MOV AH,00h ;set the configuration to video mode
+		MOV AL,13h ;choose the video mode
+		INT 10h    ;execute the configuration 
+
+		MOV AH,0Bh ;set the configuration
+		MOV BH,00h ;to the background color
+		MOV BL,00h ;choose black as background color
+		INT 10h    ;execute the configuration
+	CLS ENDP
+;----------------------------------------------------------------------	
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 	MOVE_BALL PROC NEAR
 		
 		MOV AX ,BALL_X      ; fetch the old position of the ball in x
@@ -371,6 +529,181 @@ INITIALIZE_SCREEN  ENDP
 		RET_MOVE_BALL:
 		RET
 	MOVE_BALL ENDP
+<<<<<<< HEAD
+=======
+;---------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------	
+DRAW_WALL MACRO 
+	 mov  SI , offset WALL
+     mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , WALL_Y;start Y for WALL
+	
+	 mov  DI , WALL_WIDTH
+	 add  DI , WALL_X
+	 sub  DI  ,1
+	 
+     mov  BX , WALL_HIGHT ; limit for y
+     add  BX , WALL_Y	 
+     Sub  BX , 1  
+     ;Draw player1
+	
+ outerloopWALL :
+     mov cx,WALL_X ;start x for WALL
+    
+	 innerloopWALL :	 
+			mov al ,[SI] ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			inc SI
+			cmp cx , DI ;the end X for WALL
+			jbe innerloopWALL
+			
+        inc dx
+        cmp dx  ,BX ; the end Y for WALL
+        jbe  outerloopWALL	
+		
+ENDM DRAW_WALL 
+;------------------------------------------------------------------------------------	
+;------------------------------------------------------------------------------------
+DRAW_PLAYER1 Macro Player
+   
+    ;pusha
+	
+     mov  SI , offset player  
+     mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , PLAYER_ONE_Y;start Y for player1
+	
+	 mov  DI , PLAYER_WIDTH ; limit for x
+	 add  DI , PLAYER_ONE_X
+	 sub  DI  ,1
+	 
+     mov  BX , PLAYER_HIGHT ; limit for y
+     add  BX , PLAYER_ONE_Y	 
+     Sub  BX , 1  
+     ;Draw player1
+	
+ outerloop1 :
+     mov cx,PLAYER_ONE_x ;start x for player1
+    
+	 innerloop1 :	 
+			mov al ,[SI] ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			inc SI
+			cmp cx , DI ;the end X for player1
+			jbe innerloop1
+			
+        inc dx
+        cmp dx  ,BX ; the end Y for player1
+        jbe  outerloop1	
+	;popa 
+EndM DRAW_PLAYER1
+;------------------------------------------------------------------------------------
+DRAW_PLAYER2 Macro Player
+    	
+    ;pusha
+     mov  SI , offset player  
+     mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , PLAYER_TWO_Y;start Y for player1
+	
+	 mov  DI , PLAYER_WIDTH ; limit for x
+	 add  DI , PLAYER_TWO_X
+	 sub  DI  ,1
+	 
+     mov  BX , PLAYER_HIGHT ; limit for y
+     add  BX , PLAYER_TWO_Y	 
+     Sub  BX , 1  
+     ;Draw player2
+	
+ outerloop2 :
+     mov cx,PLAYER_TWO_x ;start x for player2
+  
+	 innerloop2 :	 
+			mov al ,[SI] ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			inc SI
+			cmp cx , DI ;the end X for player2
+			jbe innerloop2
+			
+        inc dx
+        cmp dx  ,BX ; the end Y for player2
+        jbe  outerloop2	
+	;popa 
+EndM DRAW_PLAYER2
+;-----------------------------------------------------------------------------------
+
+clear_player1 Macro  X , Y
+    
+	 
+     push Bx
+	 mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , Y ;start Y for player1
+	
+	
+	 
+	 mov  DI , PLAYER_WIDTH ; limit for x
+	 add  DI , X
+	 sub  DI , 1
+	 
+     mov  BX , PLAYER_HIGHT ; limit for y
+     add  BX , Y	 
+     Sub  BX , 1
+	outerloopclear1 :
+       mov cx , X ;start x for player1
+	   
+	 innerloopclear1 :	 
+			mov al , 11 ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			cmp cx , DI ;the end X for player1
+			jbe innerloopclear1
+			
+        inc dx
+        cmp dx  ,BX ; the end Y for player1
+        jbe  outerloopclear1
+
+    pop BX    
+EndM clear_player1 
+;-----------------------------------------------------------------------------------
+
+clear_player2 Macro  X , Y
+    
+     push Bx
+	 mov  bh , 0   ;DisplayPage doesn't change	 
+     mov  Dx , Y ;start Y for player1
+	
+	
+	 
+	 mov  DI , PLAYER_WIDTH ; limit for x
+	 add  DI , X
+	 sub  DI , 1
+	 
+     mov  BX , PLAYER_HIGHT ; limit for y
+     add  BX , Y	 
+     Sub  BX , 1
+	outerloopclear2 :
+       mov cx , X ;start x for player1
+	   
+	 innerloopclear2 :	 
+			mov al , 11 ;color for this cell
+			mov ah ,0ch ;Draw command
+			int 10h     ;int fo Draw pixel
+			inc cx
+			cmp cx , DI ;the end X for player1
+			jbe innerloopclear2
+			
+        inc dx
+        cmp dx  ,BX ; the end Y for player1
+        jbe  outerloopclear2
+
+    pop BX    
+EndM clear_player2
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 ;-----------------------------------------------------------------------------------	
 
 movePlayer1 PROC NEAR 
@@ -379,8 +712,13 @@ movePlayer1 PROC NEAR
 		mov ah,1
 		int 16h
 		JZ DONE1
+<<<<<<< HEAD
 		; mov ah,0
 		; int 16h
+=======
+		mov ah,0
+		int 16h
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 		
 	    mov SI , PLAYER_ONE_X
 		mov DI , PLAYER_ONE_Y
@@ -472,7 +810,11 @@ movePlayer1 PROC NEAR
 			jmp DONE
 			
         DONE:		
+<<<<<<< HEAD
 		  CLEAR 11, OLD_X_Player1 ,OLD_Y_Player1, PLAYER_WIDTH, PLAYER_HIGHT
+=======
+		  clear_player1 OLD_X_Player1 ,OLD_Y_Player1
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 		  RET
 		
         DONEALL:
@@ -508,9 +850,15 @@ movePlayer2 PROC NEAR
 		;Right
 		CMP AH, 77
 		JZ Right2
+<<<<<<< HEAD
 		
 		JMP DEFAULT2
 		
+=======
+		
+		JMP DEFAULT2
+		
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 		
 		 	
 		
@@ -580,7 +928,11 @@ movePlayer2 PROC NEAR
 			jmp DONE2
 			
         DONE2:		
+<<<<<<< HEAD
 		  CLEAR 11, OLD_X_Player2 ,OLD_Y_Player2, PLAYER_WIDTH, PLAYER_HIGHT
+=======
+		  clear_player2 OLD_X_Player2 ,OLD_Y_Player2
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 		  RET 
 		
         DONEALL2:
@@ -760,7 +1112,11 @@ MAIN PROC FAR
 	Mov Al , 13h
 	int 10h
 	
+<<<<<<< HEAD
 	CALL INITIALIZE_SCREEN 
+=======
+	intilaize_screen BGC
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 		;CALL ClS ;CALL CLEAR_SCREEN
 			
 		CHECK_TIME:
@@ -776,20 +1132,34 @@ MAIN PROC FAR
 			
 			
 			;DRAW the Wall
+<<<<<<< HEAD
 		    DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
 			
 			; Draw Players 
 			DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
 			DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT 
+=======
+		    DRAW_WALL     ;Macro to draw wall
+			
+			; Draw Players 
+			DRAW_PLAYER1 PLAYER1    
+			DRAW_PLAYER2 PLAYER2
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 			
 			; Move Players
 			CALL movePlayer1  ;move for player1 
 			CALL movePlayer2  ;move for player2 
 			
 			; Move BALL and Draw it
+<<<<<<< HEAD
 			CLEAR BGC, OLD_BALL_X, OLD_BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
 			CALL MOVE_BALL
 		    DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		; CALL DRAW_BALL / yellow              
+=======
+			CLEAR_BALL BGC       ;clear old poition / Cyan
+			CALL MOVE_BALL
+		    DRAW_BALL 13		; CALL DRAW_BALL / yellow              
+>>>>>>> 1a754808647fa9eae9cf467ccc48719b689151db
 			
 			JMP CHECK_TIME ;after everything checks time again
 			
