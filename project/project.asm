@@ -26,8 +26,8 @@
 	WALL_WIDTH EQU 10
 	WALL_WIDTH_HALF EQU 5
 	WALL_HIGHT EQU 100
-	BLACK               EQU         00h
-    BROWN               EQU         06h
+	BLACK               EQU         07h ; gray
+    BROWN               EQU         04h ; Red
    
 
 WALL                db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
