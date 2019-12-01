@@ -7,6 +7,7 @@
 	WINDOW_WIDTH_HALF EQU 160
 	WINDOW_HEIGHT EQU 200  ;the height of the window (200 pixels)
 	WINDOW_HALF_HEIGHT EQU 100  	
+	BGC EQU 11 ;Light Cyan
 ;------------------------------------------------------------------------	
 	TIME_AUX DB 0 ;variable used when checking if the time has changed
 ;------------------------------------------------------------------------	
@@ -992,7 +993,7 @@ MAIN PROC FAR
 	Mov Al , 13h
 	int 10h
 	
-	intilaize_screen 11
+	intilaize_screen BGC
 		;CALL ClS ;CALL CLEAR_SCREEN
 			
 		CHECK_TIME:
@@ -1019,7 +1020,7 @@ MAIN PROC FAR
 			movePlayer2  ;move for player2 
 			
 			; Move BALL and Draw it
-			CLEAR_BALL 11        ;clear old poition / Cyan
+			CLEAR_BALL BGC       ;clear old poition / Cyan
 			CALL MOVE_BALL
 		    DRAW_BALL 13		; CALL DRAW_BALL / yellow              
 			
