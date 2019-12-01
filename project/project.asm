@@ -571,13 +571,13 @@ movePlayer1 Macro
 			jmp DONEALL
 		
 		DECREASEX:
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_X;
 			SUB PLAYER_ONE_X, AX
 			
 			
 			jmp DONE
 		INCREASEX: 
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_Y;
 			ADD PLAYER_ONE_X, AX
 			
 			
@@ -596,7 +596,7 @@ movePlayer1 Macro
 		
 		
         DONEALL:
-        
+        mov bl,00
 EndM movePlayer1
 ;-----------------------------------------------------------------------------------	
 
@@ -679,13 +679,13 @@ movePlayer2 Macro
 			jmp DONEALL2
 		
 		DECREASEX2:
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_X;
 			SUB PLAYER_TWO_X, AX
 			
 			
 			jmp DONE2
 		INCREASEX2: 
-			MOV AX, 0AH;
+			MOV AX, PLAYER_VELOCITY_Y;
 			ADD PLAYER_TWO_X, AX
 			
 			
@@ -704,7 +704,7 @@ movePlayer2 Macro
 		
 		
         DONEALL2:
-        
+        mov bl,00
 EndM movePlayer2
 ;---------------------------------------------------------------------------	
 	;Collision with the wall in the x-axis
