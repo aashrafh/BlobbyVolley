@@ -29,6 +29,18 @@ include test.inc
 	WALL_HIGHT EQU 85
 	BLACK               EQU         07h ; gray
     BROWN               EQU         04h ; Red
+;----------------------------- for chat and score -----------------------------------
+PLAYER1_SCORE db 0
+PLAYER2_SCORE db 0
+NAME_SIZE     EQU 7
+COUNTER_NAME  DB NAME_SIZE
+Player1_Name  DB 'Ahmed98','$'
+Player2_Name  DB 'Mohamed','$'	     
+
+Border db '------------------------------------------------------------------------------------------------------','$'
+CLOSE_GAME DB 'ENETER F4 TO CLOSE GAME','$'   
+;--------------------------------------------------------------------------------	
+	
    
 
 WALL                db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
@@ -151,8 +163,8 @@ BALL         db BGC ,CB ,CB  ,BGC
 	
 	PLAYER_ONE_X DW  29   			;X position of the first player
 	PLAYER_ONE_Y DW 136			;Y position of the first player
-    OLD_X_Player1 DW 00
-	OLD_Y_Player1 DW 00 
+    OLD_X_Player1 DW 29
+	OLD_Y_Player1 DW 136 
 	TEMP_MOVE_1   DW 00
 	
 	PLAYER1 DB  11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 
@@ -186,8 +198,8 @@ BALL         db BGC ,CB ,CB  ,BGC
 	
 	PLAYER_TWO_X DW  270			;X position of the second player
 	PLAYER_TWO_Y DW  136			;Y position of the second player
-	OLD_X_Player2 DW 00
-	OLD_Y_Player2 DW 00 
+	OLD_X_Player2 DW 270
+	OLD_Y_Player2 DW 270 
     
 	PLAYER2 DB   11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 , 11 ,11
 	        DB   11 , 11 , 11 , 11 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 00 , 11 , 11 , 11 , 11 , 11 , 11 , 11 ,11
@@ -233,12 +245,87 @@ BALL         db BGC ,CB ,CB  ,BGC
 ;--------------------------------------------------------------------------	
 .CODE
 
+
+;MAIN MENUE
+MAIN PROC FAR
+
+	MOV AX, @DATA
+	MOV DS, AX	
+	Mov es,ax 
+
+    Mov ah , 00h  ;change to vedio mode
+	Mov Al , 13h
+	int 10h
+	
+	;CALL MAIN_MENUE
+	
+	
+	;CLEAR 00 ,0 , 0 , PLAYER_WIDTH ,PLAYER_HIGHT
+	CALL INITIALIZE_SCREEN 
+		; ;CALL ClS ;CALL CLEAR_SCREEN
+			
+		CHECK_TIME:
+			
+			MOV AH,2Ch ;get the system time
+			INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
+			
+			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
+			JE CHECK_TIME    ;if it is the same, check again
+			                 ;if it's different, then draw, move, etc.
+			
+			MOV TIME_AUX,DL ;update time
+			
+			
+			;DRAW the Wall
+		    DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
+		
+			; Draw Players 
+			DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
+			DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT
+			;call DISPLAY_NAME 
+			; Move Players
+			CALL movePlayer1  ;move for player1 
+			CALL movePlayer2  ;move for player2 
+			
+		    ;Move BALL and Draw it
+			CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
+			CALL MOVE_BALL
+		    DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		; CALL DRAW_BALL / yellow 
+			
+			
+			
+			
+			
+			-----------------------for chat and score ---------------------------------------------
+			; message, size, row,col
+			; print PLAYER1_SCORE,16,0,1
+			; print PLAYER2_SCORE,16,21,1
+			; print Border,40,0,2
+			; print PLAYER1_NAME,7,0,0
+			 ; call DISPLAY_NAME	       
+            ; DISPLAY STRING WITH COLOR.
+      
+         	
+         	
+      
+
+			-----------------------------------------------------------------------------------------------
+			
+			JMP CHECK_TIME ;after everything checks time again
+			
+		;return the control to the dos
+		MOV AH, 4CH
+		INT 21H
+			
+MAIN ENDP
 ;------------------------------set the background color--------------------------------------------
 INITIALIZE_SCREEN PROC
   
     MOV AH, 06h    ; Scroll up function
 	XOR AL, AL     ; Clear entire screen
 	XOR CX, CX     ; Upper left corner CH=row, CL=column
+	MOV CL, 0
+	MOV CH, 1
 	MOV DX, 184FH  ; lower right corner DH=row, DL=column 
 	MOV BH, BGC     ; color 
 	INT 10H
@@ -367,7 +454,7 @@ INITIALIZE_SCREEN  ENDP
 	MOVE_BALL ENDP
 ;-----------------------------------------------------------------------------------	
 
-movePlayer1 PROC FAR 
+movePlayer1 PROC near 
     ;pusha
 ;READ CHARACTER FROM KEYBOARD
 		mov ah,1
@@ -765,54 +852,70 @@ movePlayer2 ENDP
 		RET_CHECK_PLAYER_DOWN_Y:
 		RET 
 	CHECK_PLAYER_DOWN_Y ENDP
-;------------------------------------------------------------------------------------	
-MAIN PROC FAR
-
-	MOV AX, @DATA
-	MOV DS, AX	
-	
-
-    Mov ah , 00h  ;change to vedio mode
-	Mov Al , 13h
-	int 10h
-	
-	CALL INITIALIZE_SCREEN 
-		;CALL ClS ;CALL CLEAR_SCREEN
-			
-		CHECK_TIME:
 		
-			MOV AH,2Ch ;get the system time
-			INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
+;------------------------------------------------------------------------------------	
+ ;score and players name
+ DISPLAY_NAME PROC NEAR
+ 
+    	    MOV DL,0	;start from left	
+			LEA SI,PLAYER1_NAME
+			;PLAYER_NAME 1 
+			NAME1:
+			mov ah,9
+			mov bh,0
+			MOV AL,[SI]
+			mov bl,0b4h
+			mov cx,1
+			int 10h 
+			INC SI
+			mov ah,2
+			inc dl
+			int 10h
 			
-			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
-			JE CHECK_TIME    ;if it is the same, check again
-			                 ;if it's different, then draw, move, etc.
+			dec COUNTER_NAME
+			jnz NAME1
 			
-			MOV TIME_AUX,DL ;update time
+			;MOVE CURSOR
+			MOV AH,2
+			MOV DH,0    ;ROW 
+			MOV DL,20   ;COL
+			INT 10H
+
 			
+			MOV COUNTER_NAME,NAME_SIZE 
+			;PLAYER_NAME 2
+			LEA SI,PLAYER2_NAME
+			NAME2:
 			
-			;DRAW the Wall
-		    DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
-			
-			; Draw Players 
-			DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
-			DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT
-			
-			; Move Players
-			CALL movePlayer1  ;move for player1 
-			CALL movePlayer2  ;move for player2 
-			
-			; Move BALL and Draw it
-			CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
-			CALL MOVE_BALL
-		    DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		; CALL DRAW_BALL / yellow              
-			
-			JMP CHECK_TIME ;after everything checks time again
-			
-		;return the control to the dos
-		;MOV AH, 4CH
-		;INT 21H
-			
-MAIN ENDP
+			mov ah,9
+			mov bh,0
+			mov al,[SI]
+			mov bl,0b4h
+		    mov cx,1
+			int 10h 
+			INC SI
+			mov ah,2
+			inc dl
+			int 10h
+			dec COUNTER_NAME
+			jnz NAME2
+			 DISPLAY_NAME ENDP
+              
+
+;---------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 END MAIN
 ;---------------------------------------------------------------------	
+
+
+
+
+
+
