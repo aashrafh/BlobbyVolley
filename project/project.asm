@@ -1,4 +1,5 @@
-include test.inc
+INCLUDE MACROS.inc
+
 .MODEL SMALL
 ;-------------------------------------------------------------------------
 .STACK 64
@@ -43,8 +44,6 @@ Border db '---------------------------------------------------------------------
 CLOSE_GAME DB 'ENETER F4 TO CLOSE GAME','$'   
 ;--------------------------------------------------------------------------------	
 	
-   
-
 WALL                db       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK 
                     db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
                     db       BROWN, BROWN, BROWN, BLACK, BLACK, BROWN, BROWN, BROWN, BROWN, BROWN
