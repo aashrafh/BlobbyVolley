@@ -76,9 +76,9 @@ OLD_Y_Player2 DW 270
 PLAYER_X DW ?
 PLAYER_Y DW ?
 PLAYER_WIDTH DW 21 			;size of the player in X direction
-PLAYER_HIGHT DW 25 			;size of the player in Y direction
+PLAYER_HIGHT DW 24 			;size of the player in Y direction
 PLAYER_VELOCITY_X DW 21      	;X (horizontal) velocity of the player
-PLAYER_VELOCITY_Y DW 25     	;Y (vertical) velocity of the player
+PLAYER_VELOCITY_Y DW 24     	;Y (vertical) velocity of the player
 
 ;player one playground
 PLAYER_ONE_PLAYGROUND_X_START EQU BALL_SIZE
@@ -370,7 +370,7 @@ movePlayer1 PROC near
 		
 		MOV AX, PLAYER_VELOCITY_Y
 		ADD PLAYER_ONE_Y,AX
-		CMP PLAYER_ONE_Y, 160
+		CMP PLAYER_ONE_Y, 159
 		JA DECREASEY
 		
 		jmp DONE
@@ -486,7 +486,7 @@ movePlayer2 PROC NEAR
 		
 		MOV AX, PLAYER_VELOCITY_Y
 		ADD PLAYER_TWO_Y,AX
-		CMP PLAYER_TWO_Y, 160
+		CMP PLAYER_TWO_Y, 159
 		JA DECREASEY2
 		
 		jmp DONE2
