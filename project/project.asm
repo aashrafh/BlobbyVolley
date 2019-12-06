@@ -32,10 +32,12 @@ include test.inc
 ;----------------------------- for chat and score -----------------------------------
 PLAYER1_SCORE db 0
 PLAYER2_SCORE db 0
+MAX_SCORE EQU  3
+MAXSCORE   DB MAX_SCORE 
 NAME_SIZE     EQU 7
 COUNTER_NAME  DB NAME_SIZE
-Player1_Name  DB 'Ahmed98','$'
-Player2_Name  DB 'Mohamed','$'	     
+Player1_Name  DB 'Ahmed98'
+Player2_Name  DB 'Mohamed'	     
 
 Border db '------------------------------------------------------------------------------------------------------','$'
 CLOSE_GAME DB 'ENETER F4 TO CLOSE GAME','$'   
@@ -256,11 +258,11 @@ MAIN PROC FAR
     Mov ah , 00h  ;change to vedio mode
 	Mov Al , 13h
 	int 10h
-	
-	;CALL MAIN_MENUE
-	
-	
-	;CLEAR 00 ,0 , 0 , PLAYER_WIDTH ,PLAYER_HIGHT
+		
+	CALL INITIALIZE_SCREEN 
+	print PLAYER1_NAME,7,0,0
+    print PLAYER2_NAME,7,30,0
+
 	CALL INITIALIZE_SCREEN 
 		; ;CALL ClS ;CALL CLEAR_SCREEN
 			
@@ -296,7 +298,7 @@ MAIN PROC FAR
 			
 			
 			
-			-----------------------for chat and score ---------------------------------------------
+			;-----------------------for chat and score ---------------------------------------------
 			; message, size, row,col
 			; print PLAYER1_SCORE,16,0,1
 			; print PLAYER2_SCORE,16,21,1
@@ -309,7 +311,7 @@ MAIN PROC FAR
          	
       
 
-			-----------------------------------------------------------------------------------------------
+			;-----------------------------------------------------------------------------------------------
 			
 			JMP CHECK_TIME ;after everything checks time again
 			
@@ -327,6 +329,9 @@ INITIALIZE_SCREEN PROC
 	MOV CL, 0
 	MOV CH, 1
 	MOV DX, 184FH  ; lower right corner DH=row, DL=column 
+	mov dl,4fh
+	mov dh,13h
+	
 	MOV BH, BGC     ; color 
 	INT 10H
   
