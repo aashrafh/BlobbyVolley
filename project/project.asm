@@ -393,11 +393,10 @@ INITIALIZE_SCREEN  ENDP
 		
 		CHECK_Y:
 		
-		;check window
-		MOV AX, BALL_SIZE
-		CMP BALL_Y,AX   ;BALL_Y < 0 +  (Y -> collided)
-		JL NEG_VELOCITY_Y                          
-		
+		;check top  window
+		MOV AX, BALL_SIZE+8
+		CMP BALL_Y,AX   ;BALL_Y + 8 < 0 
+		JL NEG_VELOCITY_Y
 		;check wall y
 		CALL CHECK_WALL_Y
 		CMP AX, 1
@@ -731,7 +730,7 @@ movePlayer2 ENDP
 		JB RET_CHECK_PLAYER_ONE_PLAYGROUND
 		CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_END   ;out of the playground
 		JA RET_CHECK_PLAYER_ONE_PLAYGROUND
-		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE)	  ;if it in the playground but strictly above the ground
+		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE - 44)	  ;if it in the playground but strictly above the ground
 		JB RET_CHECK_PLAYER_ONE_PLAYGROUND        ;then no counted points
 		MOV AX, 1                                 ;there is an attack
 		RET_CHECK_PLAYER_ONE_PLAYGROUND:
@@ -744,7 +743,7 @@ movePlayer2 ENDP
 		JB RET_CHECK_PLAYER_TWO_PLAYGROUND
 		CMP BALL_X, PLAYER_TWO_PLAYGROUND_X_END   ;out of the playground
 		JA RET_CHECK_PLAYER_TWO_PLAYGROUND 
-		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE)	  ;if it in the playground but strictly above the ground
+		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE-44)	  ;if it in the playground but strictly above the ground
 		JB RET_CHECK_PLAYER_TWO_PLAYGROUND        ;then no counted points
 		MOV AX, 1                                 ;there is an attack
 		RET_CHECK_PLAYER_TWO_PLAYGROUND:
