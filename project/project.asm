@@ -30,10 +30,10 @@ BALL_VELOCITY_Y DW 04 ;Y (vertical) velocity of the ball
 	
 ;wall data
 WALL_X EQU (WINDOW_WIDTH_HALF - WALL_WIDTH_HALF)
-WALL_Y EQU 75
+WALL_Y EQU 90
 WALL_WIDTH EQU 10
 WALL_WIDTH_HALF EQU 5
-WALL_HIGHT EQU 85
+WALL_HIGHT EQU 70
 BLACK               EQU         07h ; gray
 BROWN               EQU         04h ; Red
 
