@@ -405,7 +405,7 @@ MOVE_BALL PROC NEAR
 	;check wall x
 	MOV AX, (160 + 5 + 4)
 	MOV BX, (160 + 5)
-	MOV CX, 90
+	MOV CX, (90 - 4)
 	MOV DX, 160
 	CALL CHECK_INSIDE_THIS_AREA 
 	CMP SI, 1                         
@@ -413,7 +413,7 @@ MOVE_BALL PROC NEAR
 	
 	MOV AX, (160 - 5)
 	MOV BX, (160 - 5 - 4)
-	MOV CX, 90
+	MOV CX, (90 - 4)
 	MOV DX, 160
 	CALL CHECK_INSIDE_THIS_AREA 
 	CMP SI, 1                         
@@ -462,7 +462,7 @@ MOVE_BALL PROC NEAR
 	;check wall y
 	MOV AX, (160 + 5 + 4)
 	MOV BX, (160 - 5 - 4)
-	MOV CX, (90 + 4)
+	MOV CX, (90 - 4)
 	MOV DX, 90
 	CALL CHECK_INSIDE_THIS_AREA 
 	CMP SI, 1                         
