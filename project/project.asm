@@ -39,16 +39,51 @@ BROWN               EQU         04h ; Red
 ;score and chat data
 PLAYER1_SCORE db 0
 PLAYER2_SCORE db 0
-MAX_SCORE EQU  3
-MAXSCORE   DB MAX_SCORE 
-NAME_SIZE     EQU 7
-COUNTER_NAME  DB NAME_SIZE
-Player1_Name  DB 'Ahmed98'
-Player2_Name  DB 'Mohamed'	     
+MAX_SCORE EQU  7
+COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
+COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
 
-Border db '------------------------------------------------------------------------------------------------------','$'
-CLOSE_GAME DB 'ENETER F4 TO CLOSE GAME','$'
-   
+
+CAHT_SIZE       EQU 24   
+CHAT1           DB ':CHAT WILL BE IN PHASE 2'
+CHAT2           DB ':CHAT WILL BE IN PHASE 2'
+
+
+WON_SIZE        EQU 10
+player1WON      DB 'PLAYER1 IS WINNWER','$'
+player2WON      DB 'PLAYER2 IS WINNWER','$'
+Border          db '------------------------------------------------------------------------------------------------------'
+CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME  ' 
+PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN 2 TO MAIN MAINMENUE','$'
+PLAY_AGIAN_SIZE EQU 41	 
+
+;deal with file
+BCGBALLWidth         EQU 320
+BCGBALLHeight        EQU 195
+BCGBALLFilename      DB 'draw.bin', 0
+BCGBALLFilehandle    DW ?
+BCGBALLData          DB BCGBALLWidth*BCGBALLHeight dup(0)
+	
+;commands stings
+
+COMMAND_ONE   DB 'PRESS 1 TO ','$'
+COMMAND_ONE_C DB '  CHAT MODE','$'
+COMMAND_TWO   DB 'PRESS 2 TO ','$'
+COMMAND_TWO_C DB '  PLAY MODE','$'
+PHASE_2       DB 'CHAT WILL BE IN PHASE 2 PRESS ANY KEY TO START','$'
+Enter_max_letters db 'Enter 5 letters  only','$'
+PRESS1_TO_START DB 'PRESS ANY KEY TO START','$'
+;number of COMMAND 1 and 2 string chars
+CMD EQU 11
+Counter_string db CMD
+
+;player names
+NAME_SIZE      EQU 7
+PLAYERNAME_1 db NAME_SIZE,?,NAME_SIZE   dup('$')
+PLAYERNAME_1_MESSAGE db 'ENTER PLAYER 1 NAME ','$'
+PLAYERNAME_2 db NAME_SIZE,?,NAME_SIZE   dup('$')
+PLAYERNAME_2_MESSAGE db 'ENTER PLAYER 2 NAME ','$'
+  
 ;ball data	
 CB   EQU  13   ; color of the ball
                ; BGC defined back ground color 
@@ -66,7 +101,6 @@ OLD_Y_Player1 DW 136
 TEMP_MOVE_1   DW 00
 
 ;player 2        
-
 PLAYER_TWO_X DW  270			;X position of the second player
 PLAYER_TWO_Y DW  136			;Y position of the second player
 OLD_X_Player2 DW 270
@@ -78,72 +112,234 @@ PLAYER_Y DW ?
 PLAYER_WIDTH DW 21 			;size of the player in X direction
 PLAYER_HIGHT DW 24 			;size of the player in Y direction
 PLAYER_VELOCITY_X DW 21      	;X (horizontal) velocity of the player
-PLAYER_VELOCITY_Y DW 24     	;Y (vertical) velocity of the player
+PLAYER_VELOCITY_Y DW 24    	;Y (vertical) velocity of the player
 
 ;player one playground
 PLAYER_ONE_PLAYGROUND_X_START EQU BALL_SIZE
-PLAYER_ONE_PLAYGROUND_X_END EQU (WALL_X - BALL_SIZE)
+PLAYER_ONE_PLAYGROUND_X_END   EQU (WALL_X - BALL_SIZE)
 
 ;player two playground
 PLAYER_TWO_PLAYGROUND_X_START EQU (WALL_X + WALL_WIDTH + BALL_SIZE)
-PLAYER_TWO_PLAYGROUND_X_END EQU (WINDOW_WIDTH - BALL_SIZE)
-	
+PLAYER_TWO_PLAYGROUND_X_END   EQU (WINDOW_WIDTH - BALL_SIZE)
+
 .CODE
  ;__  __     _     ___   _  _ 
  ;|  \/  |   /_\   |_ _| | \| |
  ;| |\/| |  / _ \   | |  | .` |
  ;|_|  |_| /_/ \_\ |___| |_|\_|
                               
+;MAIN MENUE
 MAIN PROC FAR
 
 	MOV AX, @DATA
 	MOV DS, AX	
 	Mov es,ax 
 
+LABELBACK:   
     Mov ah , 00h  ;change to vedio mode
 	Mov Al , 13h
 	int 10h
-		
-	CALL INITIALIZE_SCREEN 
-	print PLAYER1_NAME,7,0,0
-    print PLAYER2_NAME,7,30,0
+	
+;--------------------------------------------------------------read data and draw----------------------------------------------------------------
+    CALL OpenFile
+    CALL ReadData
+	
+    LEA BX , BCGBALLData ; BL contains index at the current drawn pixel
+	
+    MOV CX,0
+    MOV DX,0
+    MOV AH,0ch
+	
+; Drawing loop
+drawLoop:
+    MOV AL,[BX]
+    INT 10h 
+    INC CX
+    INC BX
+    CMP CX,BCGBALLWidth
+JNE drawLoop 
+	
+    MOV CX , 0
+    INC DX
+    CMP DX , BCGBALLHeight
+JNE drawLoop
+    call CloseFile
 
-	CALL INITIALIZE_SCREEN 
-			
-		CHECK_TIME:
-			
-			MOV AH,2Ch ;get the system time
-			INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
-			
-			CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
-			JE CHECK_TIME    ;if it is the same, check again
-			                 ;if it's different, then draw, move, etc.
-			
-			MOV TIME_AUX,DL ;update time
-			
-			
-			;DRAW the Wall
-		    DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
+;--------------------------------------------------------------end read data and draw----------------------------------------------------------------
+print COMMAND_ONE,CMD,3,1
+print COMMAND_ONE_C,CMD,2,3
+print COMMAND_TWO,CMD,3,10
+print COMMAND_TWO_C,CMD,2,12	
+	
+	
+DEFAULTG:  
+
+   	    MOV AH , 0      ;WAIT FOR KEY
+        INT 16h
+	
+	    CMP AL, 31h     ;CHAT MODE PHASE 2
+		JE CHAT_MODE
 		
-			; Draw Players 
-			DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
-			DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT
-			;call DISPLAY_NAME 
-			; Move Players
-			CALL movePlayer1  ;move for player1 
-			CALL movePlayer2  ;move for player2 
+		CMP AL, 32h
+		JE VIDEO_MODE   ;PLAY MODE 
+		
+		JMP DEFAULTG
 			
-		    ;Move BALL and Draw it
-			CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
-			CALL MOVE_BALL
-		    DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		; CALL DRAW_BALL / yellow 
+	CHAT_MODE:         ;Change to Text MODE
+
+    ;text mode
+    MOV AH,0          
+    MOV AL,03h
+    INT 10h
+	JMP CHAT_PHASE_2
+		
+	VIDEO_MODE:
+	JMP GAME_MODE
+		
+CHAT_PHASE_2:
+			; mov cursor
+			MOV AH,2
+			MOV DL,5
+			MOV DH,7
+			INT 10H
 			
-			JMP CHECK_TIME ;after everything checks time again
+			MOV AH,9
+			LEA DX,PHASE_2
+			INT 21H
 			
-		;return the control to the dos
-		MOV AH, 4CH
+			mov ah,0
+            INT 16h
+			jmp LABELBACK
+			
+GAME_MODE:
+	;text mode to take names
+    MOV AH,0          
+    MOV AL,03h
+    INT 10h
+
+    CALL TAKE_PLAYER_NAME
+	
+    Mov ah , 00h  ;change to vedio mode
+	Mov Al , 13h
+	int 10h
+	
+start_game:
+	CALL INITIALIZE_SCREEN 
+    CALL INTIALIZE_SCORE
+	 
+     ;print player names and chat
+	 print PLAYERNAME_1,NAME_SIZE,0,0
+     print PLAYERNAME_2,NAME_SIZE,22,0
+	 
+	 PRINT PLAYERNAME_1,NAME_SIZE,0,21
+	 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21
+	 
+	 PRINT PLAYERNAME_2,NAME_SIZE,0,22
+	 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22	
+	 PRINT BORDER,40,0,23
+	 PRINT CLOSE_GAME,24,0,24
+
+CHECK_TIME:
+	; add f4=>check to exit game(3Eh)
+		
+	MOV AH,2Ch ;get the system time
+	INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
+	
+	CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
+	JE CHECK_TIME    ;if it is the same, check again
+					 ;if it's different, then draw, move, etc.
+	
+	MOV TIME_AUX,DL ;update time
+	
+	;DRAW the Wall
+	DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
+
+	; Draw Players 
+	DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
+	DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT
+	;call DISPLAY_NAME 
+	; Move Players
+	CALL movePlayer1  ;move for player1 
+	CALL movePlayer2  ;move for player2 
+	
+	;Move BALL and Draw it
+	CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
+	CALL MOVE_BALL
+	DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		 ; CALL DRAW_BALL / yellow 
+	
+	CMP COUNTER_END1,0
+	JE PLAYER1_WON
+	CMP COUNTER_END2,0
+	JE PLAYER2_WON
+	
+	JMP CHECK_TIME ;after everything checks time again
+PLAYER1_WON:  
+		MOV AH,0          
+		MOV AL,03h
+		INT 10h 
+		
+		mov ah,2        ;move cursor 
+		mov dl,5
+		mov dh,5
+		int 10h 
+		
+		MOV AH,9
+		LEA DX,player1WON
 		INT 21H
+		
+		mov ah,2        ;move cursor 
+		mov dl,5
+		mov dh,6
+		int 10h 
+	
+		MOV AH,9
+		LEA DX,PLAY_AGIAN 
+		INT 21H
+		
+		MOV AH,0
+		INT 16H
+		CMP AL,31H
+		;je far start_game       ;OUT OF RANGE
+		jmp control_dos
+
+PLAYER2_WON:
+	MOV AH,0          
+	MOV AL,03h
+	INT 10h 
+
+	mov ah,2        ;move cursor 
+	mov dl,5
+	mov dh,5
+	int 10h 
+	
+	MOV AH,9
+	LEA DX,player2WON
+	INT 21H
 			
+	mov ah,2        ;move cursor 
+	mov dl,5
+	mov dh,6
+	int 10h 
+
+	MOV AH,9
+	LEA DX,PLAY_AGIAN 
+	INT 21H
+	
+	MOV AH,0
+	INT 16H
+	CMP AL,31H
+	
+	MOV AH,0
+	INT 16H
+	CMP AL,31H
+	;je far start_game        ;OUT OF RANGE
+	jmp control_dos
+	
+;return the control to the dos
+control_dos:	
+	MOV AH, 4CH
+	INT 21H
+	
 MAIN ENDP
 
  ; ___   _  _   ___   _____ 
@@ -181,7 +377,6 @@ INITIALIZE_SCREEN  ENDP
                                                        
 MOVE_BALL PROC NEAR
 	
-
 	MOV AX,BALL_VELOCITY_X    
 	ADD BALL_X,AX             ;move the ball horizontally
 	MOV AX,BALL_VELOCITY_Y
@@ -233,7 +428,6 @@ MOVE_BALL PROC NEAR
 	ADD AX, 1
 	ADD BALL_X,AX             ;move the ball horizontally
 	
-	
 	CHECK_Y:
 	
 	;check top  window
@@ -253,13 +447,15 @@ MOVE_BALL PROC NEAR
 	
 	;check player one playground
 	CALL CHECK_PLAYER_ONE_PLAYGROUND
-	CMP AX, 1
-	JE NEG_VELOCITY_Y
+	CALL INCREASE_SCORE_PLAYER2
+	cmp ax,1
+	je NEG_VELOCITY_Y
 	
 	;check player two playground
 	CALL CHECK_PLAYER_TWO_PLAYGROUND
-	CMP AX, 1
-	JE NEG_VELOCITY_Y
+	CALL INCREASE_SCORE_PLAYER1
+	cmp ax,1
+	je NEG_VELOCITY_Y
 	
 	;CHECK_PLAYER_ONE_TOP_Y
 	MOV AX, PLAYER_ONE_X
@@ -719,54 +915,215 @@ CHECK_PLAYER_DOWN_Y PROC NEAR	;Detect collision in the y-axis from top
 	RET 
 CHECK_PLAYER_DOWN_Y ENDP
 	
-;------------------------------------------------------------------------------------	
-;score and players name
-DISPLAY_NAME PROC NEAR
+	
+;intialize score
 
-	MOV DL,0	;start from left	
-	LEA SI,PLAYER1_NAME
-	;PLAYER_NAME 1 
-	NAME1:
-	mov ah,9
-	mov bh,0
-	MOV AL,[SI]
-	mov bl,0b4h
-	mov cx,1
-	int 10h 
-	INC SI
-	mov ah,2
-	inc dl
-	int 10h
+INTIALIZE_SCORE PROC NEAR
 
-	dec COUNTER_NAME
-	jnz NAME1
+PLAYER1_SCORE_LABEL:
+	MOV DL,9H             ;COL
+    MOV DH,0              ;ROW
+    MOV BH,0              ;PAGE
+    MOV AH,02H
+    INT 10H               ;EXECUTE MOVE CURSOR
+        
+    MOV BL,7              ;COLOR
+    MOV AL,PLAYER1_SCORE  ;OFFSET
+		
+    ADD AL,'0'
+    
+	INC PLAYER1_SCORE
+	
+    MOV AH,0EH            ;EXECUTE PRINTING
+    INT 10H
+	mov ax,1
+PLAYER2_SCORE_LABEL:
+	MOV DL,30             ;COL
+    MOV DH,0              ;ROW
+    MOV BH,0              ;PAGE
+    MOV AH,02H
+    INT 10H               ;EXECUTE MOVE CURSOR
+        
+    MOV BL,7              ;COLOR
+    MOV AL,PLAYER2_SCORE  ;OFFSET 
+	
+    ADD AL,'0'
+    INC PLAYER2_SCORE
+    MOV AH,0EH            ;EXECUTE PRINTING
+    INT 10H
+	mov ax,1
 
-	;MOVE CURSOR
+RET
+INTIALIZE_SCORE ENDP
+
+INCREASE_SCORE_PLAYER1 PROC NEAR
+
+  CMP AX,1
+  JNE RETURN_INCREASE_SCORE_PLAYER1
+    
+    MOV DL,9H             ;COL
+    MOV DH,0              ;ROW
+    MOV BH,0              ;PAGE
+    MOV AH,02H
+    INT 10H               ;EXECUTE MOVE CURSOR
+        
+    MOV BL,7              ;COLOR
+    MOV AL,PLAYER1_SCORE  ;OFFSET 
+    INC PLAYER1_SCORE     ;INCREMENT CURSOR
+    ADD AL,'0'
+    
+    MOV AH,0EH            ;EXECUTE PRINTING
+    INT 10H
+	mov ax,1
+	DEC COUNTER_END1
+	;CALL CHECK_MAX_SCORE_1
+
+RETURN_INCREASE_SCORE_PLAYER1:
+RET
+INCREASE_SCORE_PLAYER1 ENDP
+ 
+INCREASE_SCORE_PLAYER2 PROC NEAR
+
+  	CMP AX,1
+  	JNE RETURN_INCREASE_SCORE_PLAYER2
+    
+    MOV DL,30             ;COL
+    MOV DH,0              ;ROW
+    MOV BH,0              ;PAGE
+    MOV AH,02H
+    INT 10H               ;EXECUTE MOVE CURSOR
+        
+    MOV BL,7              ;COLOR
+    MOV AL,PLAYER2_SCORE  ;OFFSET 
+    INC PLAYER2_SCORE     ;INCREMENT CURSOR
+    ADD AL,'0'
+    
+    MOV AH,0EH            ;EXECUTE PRINTING
+    INT 10H
+    mov ax,1
+	DEC COUNTER_END2
+	
+	;CALL CHECK_MAX_SCORE_2
+    RETURN_INCREASE_SCORE_PLAYER2:
+    RET
+INCREASE_SCORE_PLAYER2 ENDP
+
+OpenFile PROC 
+
+    ; Open file
+
+    MOV AH, 3Dh
+    MOV AL, 0 ; read only
+    LEA DX, BCGBALLFilename
+    INT 21h
+    
+    ; you should check carry flag to make sure it worked correctly
+    ; carry = 0 -> successful , file handle -> AX
+    ; carry = 1 -> failed , AX -> error code
+     
+    MOV [BCGBALLFilehandle], AX
+    RET
+
+OpenFile ENDP
+
+ReadData PROC
+
+    MOV AH,3Fh
+    MOV BX, [BCGBALLFilehandle]
+    MOV CX,BCGBALLWidth*BCGBALLHeight ; number of bytes to read
+    LEA DX, BCGBALLData
+    INT 21h
+    RET
+
+ReadData ENDP 
+
+CloseFile PROC
+
+	MOV AH, 3Eh
+	MOV BX, [BCGBALLFilehandle]
+
+	INT 21h
+	RET
+
+CloseFile ENDP
+
+TAKE_PLAYER_NAME PROC 
+	;move cursor
 	MOV AH,2
-	MOV DH,0    ;ROW 
-	MOV DL,20   ;COL
-	INT 10H
+	MOV DL,30
+	MOV DH,5
+	INT 10h
 
+		MOV AH,9
+		LEA DX,Enter_max_letters
+		INT 21H
 
-	MOV COUNTER_NAME,NAME_SIZE 
-	;PLAYER_NAME 2
-	LEA SI,PLAYER2_NAME
-	NAME2:
+PLAYER1_MESSAGE:
 
-	mov ah,9
-	mov bh,0
-	mov al,[SI]
-	mov bl,0b4h
-	mov cx,1
-	int 10h 
-	INC SI
-	mov ah,2
-	inc dl
-	int 10h
-	dec COUNTER_NAME
-	jnz NAME2
-DISPLAY_NAME ENDP
-              
+	;move cursor
+	MOV AH,2
+	MOV DL,0
+	MOV DH,10
+	INT 10h
+			
+	MOV AH,9
+	LEA DX,PLAYERNAME_1_MESSAGE
+	INT 21H
+	
+	;ENTER PLAYER 1 NAME
+	mov ah,0AH        ;Read from keyboard
+	LEA dx, PLAYERNAME_1                   
+	int 21h 
+	
+	mov ah,2          ;Move Cursor
+	MOV DL,0
+	MOV DH,11
+	int 10h    
+
+	;Display the input data in a new location
+	mov dx, offset PLAYERNAME_1 +2
+	mov ah, 9
+	int 21h
+	
+	mov ah,2          ;Move Cursor
+	MOV DL,0
+	MOV DH,14
+	int 10h    
+
+PLAYER2_MESSAGE:
+
+	MOV AH,9
+	LEA DX,PLAYERNAME_2_MESSAGE
+	INT 21H
+
+	mov ah,0AH        ;Read from keyboard
+	mov dx,offset PLAYERNAME_2                   
+	int 21h 
+	
+	mov ah,2          ;Move Cursor
+	MOV DL,0
+	MOV DH,15
+	int 10h  	
+	
+    mov dx, offset PLAYERNAME_2 +2;Display the input data in a new location
+	mov ah, 9
+	int 21h
+	
+	mov ah,2          ;Move Cursor
+	MOV DL,0
+	MOV DH,17
+	int 10h  	
+	    
+	mov dx, offset PRESS1_TO_START
+	mov ah, 9
+	int 21h 
+		
+	MOV AH , 0
+	INT 16h
+	
+RET
+TAKE_PLAYER_NAME ENDP
+
 END MAIN 
 	
 

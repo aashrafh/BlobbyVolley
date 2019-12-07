@@ -1,7 +1,0 @@
-[autoexec]
-mount c Z:\Workspaces\GitHub\BlobbyVolley\project
-c:
-masm project;
-masm objects;
-link project+objects;
-project

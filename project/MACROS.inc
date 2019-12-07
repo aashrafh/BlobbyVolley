@@ -58,7 +58,6 @@ DRAW MACRO COLOR, X, Y, WIDTH, HIGHT
         cmp dx  ,BX ; the end Y for WALL
         jbe  outerloop	
 ENDM DRAW
-
 print MACRO  message,size, x, y
 
     mov  ah,13h                ;SERVICE TO DISPLAY STRING WITH COLOR.
