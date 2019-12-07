@@ -167,10 +167,10 @@ JNE drawLoop
     call CloseFile
 
 ;--------------------------------------------------------------end read data and draw----------------------------------------------------------------
-print COMMAND_ONE,CMD,3,1
-print COMMAND_ONE_C,CMD,2,3
-print COMMAND_TWO,CMD,3,10
-print COMMAND_TWO_C,CMD,2,12	
+print COMMAND_ONE,CMD,3,1,01
+print COMMAND_ONE_C,CMD,2,3,01
+print COMMAND_TWO,CMD,3,10,01
+print COMMAND_TWO_C,CMD,2,12,01	
 	
 	
 DEFAULTG:  
@@ -229,16 +229,16 @@ start_game:
     CALL INTIALIZE_SCORE
 	 
      ;print player names and chat
-	 print PLAYERNAME_1,NAME_SIZE,0,0
-     print PLAYERNAME_2,NAME_SIZE,22,0
+	 print PLAYERNAME_1,NAME_SIZE,0,0,10
+     print PLAYERNAME_2,NAME_SIZE,34,0,110
 	 
-	 PRINT PLAYERNAME_1,NAME_SIZE,0,21
-	 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21
+	 PRINT PLAYERNAME_1,NAME_SIZE,0,21,01
+	 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21,01
 	 
-	 PRINT PLAYERNAME_2,NAME_SIZE,0,22
-	 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22	
-	 PRINT BORDER,40,0,23
-	 PRINT CLOSE_GAME,24,0,24
+	 PRINT PLAYERNAME_2,NAME_SIZE,0,22,01
+	 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22,01	
+	 PRINT BORDER,40,0,23,01
+	 PRINT CLOSE_GAME,24,0,24,01
 
 CHECK_TIME:
 	; add f4=>check to exit game(3Eh)
