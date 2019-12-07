@@ -40,7 +40,7 @@ BROWN               EQU         04h ; Red
 ;score and chat data
 PLAYER1_SCORE db 0
 PLAYER2_SCORE db 0
-MAX_SCORE EQU  7
+MAX_SCORE EQU  200
 COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
 
@@ -384,23 +384,40 @@ MOVE_BALL PROC NEAR
 	ADD BALL_Y,AX             ;move the ball vertically
 	
 	;check x
-	
 	;check window
-	MOV AX, BALL_SIZE
-	ADD AX, LIMIT
-	CMP BALL_X,AX                         
-	JL NEG_VELOCITY_X         ;BALL_X < 0   
 	
-	MOV AX,WINDOW_WIDTH
-	ADD AX, LIMIT
-	SUB AX,BALL_SIZE
-	CMP BALL_X,AX	          ;BALL_X > WINDOW_WIDTH - BALL_SIZE  -  (Y -> collided)
-	JG NEG_VELOCITY_X
+	MOV AX, 4
+	MOV BX, 0
+	MOV CX, 10
+	MOV DX, 160
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
+	JE NEG_VELOCITY_X          
 	
-	;check wall
-	CALL CHECK_WALL_X
-	CMP AX, 1
-	JE NEG_VELOCITY_X
+	MOV AX, 320
+	MOV BX, 316 ;320 - 4(ball size)
+	MOV CX, 10
+	MOV DX, 160
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
+	JE NEG_VELOCITY_X           
+	
+	;check wall x
+	MOV AX, (160 + 5 + 4)
+	MOV BX, (160 + 5)
+	MOV CX, 90
+	MOV DX, 160
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
+	JE NEG_VELOCITY_X           
+	
+	MOV AX, (160 - 5)
+	MOV BX, (160 - 5 - 4)
+	MOV CX, 90
+	MOV DX, 160
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
+	JE NEG_VELOCITY_X           
 	
 	;CHECK_PLAYER_ONE_X
 	MOV AX, PLAYER_ONE_X
@@ -420,7 +437,9 @@ MOVE_BALL PROC NEAR
 		
 	NEG_VELOCITY_X:
 		NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
-	
+		MOV AX, BALL_VELOCITY_X
+		ADD AX, BALL_VELOCITY_X
+		ADD BALL_X, AX             ;move the ball vertically
 	JMP CHECK_Y
 
 	NEG_VELOCITY_X_PLAYER:
@@ -431,32 +450,41 @@ MOVE_BALL PROC NEAR
 	
 	CHECK_Y:
 	
-	;check top  window
-	MOV AX, BALL_SIZE+8
-	CMP BALL_Y,AX   ;BALL_Y + 8 < 0 
-	JL NEG_VELOCITY_Y_1
-	MOV AX, WINDOW_HEIGHT
-	ADD AX, LIMIT
-	MOV BX, BALL_Y
-	ADD BX, BALL_SIZE
-	CMP BX, AX
-	JGE NEG_VELOCITY_Y_1
+	;check top of the play window
+	MOV AX, 320
+	MOV BX, 0
+	MOV CX, 0
+	MOV DX, 10
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
+	JE NEG_VELOCITY_Y_1       
+	
 	;check wall y
-	CALL CHECK_WALL_Y
-	CMP AX, 1
-	JE NEG_VELOCITY_Y
+	MOV AX, (160 + 5 + 4)
+	MOV BX, (160 - 5 - 4)
+	MOV CX, (90 + 4)
+	MOV DX, 90
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
+	JE NEG_VELOCITY_Y        
 	
 	;check player one playground
-	CALL CHECK_PLAYER_ONE_PLAYGROUND
-	CALL INCREASE_SCORE_PLAYER2
-	cmp ax,1
+	MOV AX, (160 - 5 - 4)
+	MOV BX, 4
+	MOV CX, (160 - 4)
+	MOV DX, 160
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
 	;je MOVE_TO_PLAYGROUND_1	;feature
 	JE NEG_VELOCITY_Y
 
 	;check player two playground
-	CALL CHECK_PLAYER_TWO_PLAYGROUND
-	CALL INCREASE_SCORE_PLAYER1
-	cmp ax,1
+	MOV AX, (320 - 4)
+	MOV BX, (160 + 5 + 4)
+	MOV CX, (160 - 4)
+	MOV DX, 160
+	CALL CHECK_INSIDE_THIS_AREA 
+	CMP SI, 1                         
 	;je MOVE_TO_PLAYGROUND_2	;feature
 	JE NEG_VELOCITY_Y 
 
@@ -508,13 +536,15 @@ MOVE_BALL PROC NEAR
 	
 	NEG_VELOCITY_Y:
 		NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
-	
+		MOV AX, BALL_VELOCITY_Y
+		ADD AX, BALL_VELOCITY_Y
+		ADD BALL_Y,AX             ;move the ball vertically
 	JMP RET_MOVE_BALL
 
 	NEG_VELOCITY_Y_PLAYER:
 		NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
 		MOV AX, BALL_VELOCITY_Y
-		ADD AX, 1
+		ADD AX, BALL_VELOCITY_Y
 		ADD BALL_Y,AX             ;move the ball vertically
 	
 	RET_MOVE_BALL:
@@ -764,7 +794,38 @@ movePlayer2 ENDP
 ;  / __| | || | | __|  / __| | |/ /
 ; | (__  | __ | | _|  | (__  | ' < 
 ;  \___| |_||_| |___|  \___| |_|\_\
-                                  
+;CHECK_BALL_INSIDE_THIS_AREA
+;INPUT: 
+;AX = X RIGHT
+;BX = X LEFT
+;CX = Y UP
+;DX = Y DOWN
+;OUTPUT:
+;SI = 1 -> INSIDE
+;SI = 0 -> OUTSIDE
+
+CHECK_INSIDE_THIS_AREA PROC NEAR
+
+MOV SI, 0 ;INIT SI WITH 0
+
+CMP BALL_X, AX
+JA RET_CHECK
+
+CMP BALL_X, BX
+JB RET_CHECK
+
+CMP BALL_Y, CX
+JB RET_CHECK
+
+CMP BALL_Y, DX
+JA RET_CHECK
+
+MOV SI, 1 ;INSIDE!
+RET_CHECK:
+RET
+
+CHECK_INSIDE_THIS_AREA ENDP
+
 ;Collision with the wall in the x-axis
 CHECK_WALL_X PROC NEAR
 	MOV AX, 0
