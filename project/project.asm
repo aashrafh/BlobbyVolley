@@ -17,7 +17,7 @@ WINDOW_WIDTH_HALF EQU 160
 WINDOW_HEIGHT EQU 200  ;the height of the window (200 pixels)
 WINDOW_HALF_HEIGHT EQU 100  	
 BGC EQU 11 ;Light Cyan
-	
+LIMIT EQU 1
 TIME_AUX DB 0 ;variable used when checking if the time has changed
 
 ;ball data
@@ -191,10 +191,12 @@ MOVE_BALL PROC NEAR
 	
 	;check window
 	MOV AX, BALL_SIZE
+	ADD AX, LIMIT
 	CMP BALL_X,AX                         
 	JL NEG_VELOCITY_X         ;BALL_X < 0   
 	
 	MOV AX,WINDOW_WIDTH
+	ADD AX, LIMIT
 	SUB AX,BALL_SIZE
 	CMP BALL_X,AX	          ;BALL_X > WINDOW_WIDTH - BALL_SIZE  -  (Y -> collided)
 	JG NEG_VELOCITY_X
@@ -238,6 +240,12 @@ MOVE_BALL PROC NEAR
 	MOV AX, BALL_SIZE+8
 	CMP BALL_Y,AX   ;BALL_Y + 8 < 0 
 	JL NEG_VELOCITY_Y
+	MOV AX, WINDOW_HEIGHT
+	ADD AX, LIMIT
+	MOV BX, BALL_Y
+	ADD BX, BALL_SIZE
+	CMP BX, AX
+	JGE NEG_VELOCITY_Y
 	;check wall y
 	CALL CHECK_WALL_Y
 	CMP AX, 1
@@ -597,14 +605,16 @@ CHECK_PLAYER_X PROC NEAR    ;Detect collision in the x-axis
 	MOV PLAYER_Y, BX		;Y of the specified player (first or second)
 	MOV AX, 0				;flag
 	;Check collision from left
-	MOV DX, PLAYER_X		
+	MOV DX, PLAYER_X
+	ADD DX, LIMIT
 	SUB DX, BALL_SIZE
 	CMP BALL_X, DX			;If there is a left collision then => BALL_X = PLAYER_X - BALL_SIZE
 	JB RET_CHECK_PLAYER_X   ;Below = far = no collision
 	
 	;Check collision from right
 	MOV DX, PLAYER_X
-	ADD DX, PLAYER_WIDTH	
+	ADD DX, PLAYER_WIDTH
+	ADD DX, LIMIT
 	ADD DX, BALL_SIZE
 	CMP BALL_X, DX			;If there is a left collision then => BALL_X = PLAYER_X + PLAYER_WIDTH + BALL_SIZE
 	JA RET_CHECK_PLAYER_X   ;Above = far = no collision
@@ -612,11 +622,13 @@ CHECK_PLAYER_X PROC NEAR    ;Detect collision in the x-axis
 	;If there is a collision in the x-axis then we need one more check
 	;We have to check the y boundaries
 	MOV DX, PLAYER_Y
+	ADD DX, LIMIT
 	CMP BALL_Y, DX			
 	JB RET_CHECK_PLAYER_X	;above the the player = no collision
 	
 	MOV DX, PLAYER_Y
 	ADD DX, PLAYER_HIGHT
+	ADD DX, LIMIT
 	CMP BALL_Y, DX
 	JA RET_CHECK_PLAYER_X 	;below the the player = no collision
 	
@@ -632,12 +644,14 @@ CHECK_PLAYER_TOP_Y PROC NEAR	;Detect collision in the y-axis from top
 	
 	;Check X boundraies same as CHECK_PLAYER_X
 	MOV DX, PLAYER_X
+	ADD DX, LIMIT
 	SUB DX, BALL_SIZE
 	CMP BALL_X, DX
 	JB RET_CHECK_PLAYER_TOP_Y
 	
 	MOV DX, PLAYER_X
 	ADD DX, PLAYER_WIDTH
+	ADD DX, LIMIT
 	ADD DX, BALL_SIZE
 	CMP BALL_X, DX 
 	JA RET_CHECK_PLAYER_TOP_Y
@@ -648,10 +662,12 @@ CHECK_PLAYER_TOP_Y PROC NEAR	;Detect collision in the y-axis from top
 	;AND
 	;PLAYER_Y <= BALL_Y + BALL_SIZE <= PLAYER_Y + PLAYER_HIGHT
 	MOV DX, PLAYER_Y
+	ADD DX, LIMIT
 	CMP BALL_Y, DX
 	JB RET_CHECK_PLAYER_TOP_Y	;Above the player
 	
 	MOV DX, PLAYER_Y
+	ADD DX, LIMIT
 	ADD DX, BALL_SIZE
 	CMP BALL_Y, DX
 	JA RET_CHECK_PLAYER_TOP_Y	;Below the Player
@@ -669,11 +685,13 @@ CHECK_PLAYER_DOWN_Y PROC NEAR	;Detect collision in the y-axis from top
 	;Check X boundraies same as CHECK_PLAYER_X
 	MOV DX, PLAYER_X
 	SUB DX, BALL_SIZE
+	ADD DX, LIMIT
 	CMP BALL_X, DX
 	JB RET_CHECK_PLAYER_DOWN_Y
 	
 	MOV DX, PLAYER_X
 	ADD DX, PLAYER_WIDTH
+	ADD DX, LIMIT
 	ADD DX, BALL_SIZE
 	CMP BALL_X, DX 
 	JA RET_CHECK_PLAYER_DOWN_Y
@@ -685,12 +703,14 @@ CHECK_PLAYER_DOWN_Y PROC NEAR	;Detect collision in the y-axis from top
 	;PLAYER_Y <= BALL_Y + BALL_SIZE <= PLAYER_Y + PLAYER_HIGHT
 	MOV DX, PLAYER_Y
 	ADD DX, PLAYER_HIGHT
+	ADD DX, LIMIT
 	SUB DX, BALL_SIZE
 	CMP BALL_Y, DX
 	JB RET_CHECK_PLAYER_DOWN_Y	;Above the player
 	
 	MOV DX, PLAYER_Y
 	ADD DX, PLAYER_HIGHT
+	ADD DX, LIMIT
 	CMP BALL_Y, DX
 	JA RET_CHECK_PLAYER_DOWN_Y	;Below the player
 	
