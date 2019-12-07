@@ -18,7 +18,7 @@ WINDOW_HEIGHT EQU 200  ;the height of the window (200 pixels)
 WINDOW_HALF_HEIGHT EQU 100  	
 BGC EQU 11 ;Light Cyan
 LIMIT EQU 2
-WIN_LIMIT EQU 16
+WIN_LIMIT EQU 10
 TIME_AUX DB 0 ;variable used when checking if the time has changed
 
 ;ball data
@@ -95,17 +95,17 @@ BALL         db BGC ,CB ,CB  ,BGC
              db BGC ,CB ,CB  ,BGC
 			 
 ;player 1 data        
-PLAYER_ONE_X DW  29   			;X position of the first player
+PLAYER_ONE_X DW  WIN_LIMIT			;X position of the first player
 PLAYER_ONE_Y DW 136			;Y position of the first player
-OLD_X_Player1 DW 29
+OLD_X_Player1 DW WIN_LIMIT
 OLD_Y_Player1 DW 136 
 TEMP_MOVE_1   DW 00
 
 ;player 2        
-PLAYER_TWO_X DW  270			;X position of the second player
+PLAYER_TWO_X DW  (270-WIN_LIMIT)			;X position of the second player
 PLAYER_TWO_Y DW  136			;Y position of the second player
-OLD_X_Player2 DW 270
-OLD_Y_Player2 DW 270 
+OLD_X_Player2 DW (270-WIN_LIMIT)
+OLD_Y_Player2 DW 136 
 
 ;player common attributes
 PLAYER_X DW ?
@@ -167,10 +167,10 @@ JNE drawLoop
     call CloseFile
 
 ;--------------------------------------------------------------end read data and draw----------------------------------------------------------------
-print COMMAND_ONE,CMD,3,1
-print COMMAND_ONE_C,CMD,2,3
-print COMMAND_TWO,CMD,3,10
-print COMMAND_TWO_C,CMD,2,12	
+print COMMAND_ONE,CMD,3,1,01
+print COMMAND_ONE_C,CMD,2,3,01
+print COMMAND_TWO,CMD,3,10,01
+print COMMAND_TWO_C,CMD,2,12,01	
 	
 	
 DEFAULTG:  
@@ -229,16 +229,16 @@ start_game:
     CALL INTIALIZE_SCORE
 	 
      ;print player names and chat
-	 print PLAYERNAME_1,NAME_SIZE,0,0
-     print PLAYERNAME_2,NAME_SIZE,22,0
+	 print PLAYERNAME_1,NAME_SIZE,0,0,10
+     print PLAYERNAME_2,NAME_SIZE,34,0,110
 	 
-	 PRINT PLAYERNAME_1,NAME_SIZE,0,21
-	 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21
+	 PRINT PLAYERNAME_1,NAME_SIZE,0,21,01
+	 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21,01
 	 
-	 PRINT PLAYERNAME_2,NAME_SIZE,0,22
-	 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22	
-	 PRINT BORDER,40,0,23
-	 PRINT CLOSE_GAME,24,0,24
+	 PRINT PLAYERNAME_2,NAME_SIZE,0,22,01
+	 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22,01	
+	 PRINT BORDER,40,0,23,01
+	 PRINT CLOSE_GAME,24,0,24,01
 
 CHECK_TIME:
 	; add f4=>check to exit game(3Eh)
@@ -595,8 +595,9 @@ movePlayer1 PROC near
 		MOV AX,PLAYER_VELOCITY_X
 		ADD PLAYER_ONE_X,AX
 		;avoid crossing the barrier
-		MOV AX, 135
-		CMP PLAYER_ONE_X, AX
+		MOV AX, PLAYER_ONE_X
+		ADD AX, WIN_LIMIT
+		CMP AX, 135
 		JG DECREASEX
 	
 		DONE1:
@@ -713,10 +714,9 @@ movePlayer2 PROC NEAR
 		MOV AX,PLAYER_VELOCITY_X
 		ADD PLAYER_TWO_X,AX
 		;avoid crossing the barrier
-		MOV BX, 310
-		SUB BX, WIN_LIMIT
-		MOV AX, BX
-		CMP PLAYER_TWO_X, AX
+		MOV BX, PLAYER_TWO_X
+		ADD BX, WIN_LIMIT
+		CMP BX, 310
 		JG DECREASEX2
 	
 		DONE_2:
@@ -727,6 +727,7 @@ movePlayer2 PROC NEAR
 		MOV AX,PLAYER_VELOCITY_X
 		sub PLAYER_TWO_X,AX
 		MOV AX, 165
+		ADD AX, WIN_LIMIT
 		CMP PLAYER_TWO_X, AX
 		JL INCREASEX2
 		
