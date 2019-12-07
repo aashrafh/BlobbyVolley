@@ -95,17 +95,17 @@ BALL         db BGC ,CB ,CB  ,BGC
              db BGC ,CB ,CB  ,BGC
 			 
 ;player 1 data        
-PLAYER_ONE_X DW  29   			;X position of the first player
+PLAYER_ONE_X DW  WIN_LIMIT			;X position of the first player
 PLAYER_ONE_Y DW 136			;Y position of the first player
-OLD_X_Player1 DW 29
+OLD_X_Player1 DW WIN_LIMIT
 OLD_Y_Player1 DW 136 
 TEMP_MOVE_1   DW 00
 
 ;player 2        
 PLAYER_TWO_X DW  (270-WIN_LIMIT)			;X position of the second player
 PLAYER_TWO_Y DW  136			;Y position of the second player
-OLD_X_Player2 DW 270
-OLD_Y_Player2 DW 270 
+OLD_X_Player2 DW (270-WIN_LIMIT)
+OLD_Y_Player2 DW 136 
 
 ;player common attributes
 PLAYER_X DW ?
@@ -565,9 +565,9 @@ movePlayer1 PROC near
 		MOV AX,PLAYER_VELOCITY_X
 		ADD PLAYER_ONE_X,AX
 		;avoid crossing the barrier
-		MOV AX, 135
-		SUB AX, WIN_LIMIT
-		CMP PLAYER_ONE_X, AX
+		MOV AX, PLAYER_ONE_X
+		ADD AX, WIN_LIMIT
+		CMP AX, 135
 		JG DECREASEX
 	
 		DONE1:
