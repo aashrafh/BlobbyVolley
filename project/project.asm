@@ -18,7 +18,7 @@ WINDOW_HEIGHT EQU 200  ;the height of the window (200 pixels)
 WINDOW_HALF_HEIGHT EQU 100  	
 BGC EQU 11 ;Light Cyan
 LIMIT EQU 2
-WIN_LIMIT EQU 16
+WIN_LIMIT EQU 10
 TIME_AUX DB 0 ;variable used when checking if the time has changed
 
 ;ball data
