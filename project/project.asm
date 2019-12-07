@@ -102,7 +102,7 @@ OLD_Y_Player1 DW 136
 TEMP_MOVE_1   DW 00
 
 ;player 2        
-PLAYER_TWO_X DW  270			;X position of the second player
+PLAYER_TWO_X DW  (270-WIN_LIMIT)			;X position of the second player
 PLAYER_TWO_Y DW  136			;Y position of the second player
 OLD_X_Player2 DW 270
 OLD_Y_Player2 DW 270 
@@ -563,6 +563,7 @@ movePlayer1 PROC near
 		ADD PLAYER_ONE_X,AX
 		;avoid crossing the barrier
 		MOV AX, 135
+		SUB AX, WIN_LIMIT
 		CMP PLAYER_ONE_X, AX
 		JG DECREASEX
 	
@@ -680,10 +681,9 @@ movePlayer2 PROC NEAR
 		MOV AX,PLAYER_VELOCITY_X
 		ADD PLAYER_TWO_X,AX
 		;avoid crossing the barrier
-		MOV BX, 310
-		SUB BX, WIN_LIMIT
-		MOV AX, BX
-		CMP PLAYER_TWO_X, AX
+		MOV BX, PLAYER_TWO_X
+		ADD BX, WIN_LIMIT
+		CMP BX, 310
 		JG DECREASEX2
 	
 		DONE_2:
@@ -694,6 +694,7 @@ movePlayer2 PROC NEAR
 		MOV AX,PLAYER_VELOCITY_X
 		sub PLAYER_TWO_X,AX
 		MOV AX, 165
+		ADD AX, WIN_LIMIT
 		CMP PLAYER_TWO_X, AX
 		JL INCREASEX2
 		
