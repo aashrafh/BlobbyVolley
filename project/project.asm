@@ -22,7 +22,7 @@ WIN_LIMIT EQU 16
 TIME_AUX DB 0 ;variable used when checking if the time has changed
 
 ;ball data
-BALL_X DW 170 ;X start position (column) of the ball 
+BALL_X DW 30 ;X start position (column) of the ball 
 BALL_Y DW 100 ;Y start position (line) of the ball
 BALL_SIZE EQU 04 ;size of the ball (how many pixels does the ball have in width and height)
 BALL_VELOCITY_X DW 04 ;X (horizontal) velocity of the ball
@@ -124,7 +124,7 @@ PLAYER_TWO_PLAYGROUND_X_START EQU (WALL_X + WALL_WIDTH + BALL_SIZE)
 PLAYER_TWO_PLAYGROUND_X_END   EQU (WINDOW_WIDTH - BALL_SIZE)
 
 .CODE
- ;__  __     _     ___   _  _ 
+ ; __  __     _     ___   _  _ 
  ;|  \/  |   /_\   |_ _| | \| |
  ;| |\/| |  / _ \   | |  | .` |
  ;|_|  |_| /_/ \_\ |___| |_|\_|
@@ -434,13 +434,13 @@ MOVE_BALL PROC NEAR
 	;check top  window
 	MOV AX, BALL_SIZE+8
 	CMP BALL_Y,AX   ;BALL_Y + 8 < 0 
-	JL NEG_VELOCITY_Y
+	JL NEG_VELOCITY_Y_1
 	MOV AX, WINDOW_HEIGHT
 	ADD AX, LIMIT
 	MOV BX, BALL_Y
 	ADD BX, BALL_SIZE
 	CMP BX, AX
-	JGE NEG_VELOCITY_Y
+	JGE NEG_VELOCITY_Y_1
 	;check wall y
 	CALL CHECK_WALL_Y
 	CMP AX, 1
@@ -450,14 +450,19 @@ MOVE_BALL PROC NEAR
 	CALL CHECK_PLAYER_ONE_PLAYGROUND
 	CALL INCREASE_SCORE_PLAYER2
 	cmp ax,1
-	je NEG_VELOCITY_Y
+	je MOVE_TO_PLAYGROUND_1
 	
 	;check player two playground
 	CALL CHECK_PLAYER_TWO_PLAYGROUND
 	CALL INCREASE_SCORE_PLAYER1
 	cmp ax,1
-	je NEG_VELOCITY_Y
+	je MOVE_TO_PLAYGROUND_2
 	
+	JMP SKIP_1	;FOR JUMP OUT OF RANGE PROBLEM
+	NEG_VELOCITY_Y_1:
+	JMP NEG_VELOCITY_Y
+
+	SKIP_1:
 	;CHECK_PLAYER_ONE_TOP_Y
 	MOV AX, PLAYER_ONE_X
 	MOV BX, PLAYER_ONE_Y
@@ -486,6 +491,16 @@ MOVE_BALL PROC NEAR
 	CMP AX, 1
 	JE NEG_VELOCITY_Y_PLAYER
 	
+	JMP RET_MOVE_BALL
+	
+	MOVE_TO_PLAYGROUND_1:
+	MOV BALL_X, 30
+	MOV BALL_Y, 30
+	JMP RET_MOVE_BALL
+	
+	MOVE_TO_PLAYGROUND_2:
+	MOV BALL_X, (WINDOW_WIDTH-30)
+	MOV BALL_Y, 30
 	JMP RET_MOVE_BALL
 	
 	NEG_VELOCITY_Y:
