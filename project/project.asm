@@ -176,10 +176,10 @@
 		call CloseFile
 
 	;--------------------------------------------------------------end read data and draw----------------------------------------------------------------
-	print COMMAND_ONE,CMD,3,1,01
-	print COMMAND_ONE_C,CMD,2,3,01
-	print COMMAND_TWO,CMD,3,10,01
-	print COMMAND_TWO_C,CMD,2,12,01	
+	print COMMAND_ONE,CMD,3,1,04
+	print COMMAND_ONE_C,CMD,2,3,04
+	print COMMAND_TWO,CMD,3,10,04
+	print COMMAND_TWO_C,CMD,2,12,04	
 		
 		
 	DEFAULTG:  
