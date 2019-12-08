@@ -771,7 +771,7 @@ movePlayer1 ENDP
 			;check left screen
 			MOV AX ,PLAYER_TWO_X
 	        
-			CMP AX , (WALL_X+WALL_WIDTH+5)
+			CMP AX , (WALL_X+WALL_WIDTH+10)
 			JL DEFAULT2
 			
 			jmp DONE2
