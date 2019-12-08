@@ -25,8 +25,8 @@ TIME_AUX DB 0 ;variable used when checking if the time has changed
 BALL_X DW 30 ;X start position (column) of the ball 
 BALL_Y DW 100 ;Y start position (line) of the ball
 BALL_SIZE EQU 04 ;size of the ball (how many pixels does the ball have in width and height)
-BALL_VELOCITY_X DW 03 ;X (horizontal) velocity of the ball
-BALL_VELOCITY_Y DW 03 ;Y (vertical) velocity of the ball
+BALL_VELOCITY_X DW 04 ;X (horizontal) velocity of the ball
+BALL_VELOCITY_Y DW 04 ;Y (vertical) velocity of the ball
 	
 ;wall data
 WALL_X EQU (WINDOW_WIDTH_HALF - WALL_WIDTH_HALF)
@@ -40,7 +40,7 @@ BROWN               EQU         04h ; Red
 ;score and chat data
 PLAYER1_SCORE db 0
 PLAYER2_SCORE db 0
-MAX_SCORE EQU  200
+MAX_SCORE EQU  2
 COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
 
@@ -269,12 +269,19 @@ CHECK_TIME:
 	DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		 ; CALL DRAW_BALL / yellow 
 	
 	CMP COUNTER_END1,0
-	JE PLAYER1_WON
+	JE PLAYERWON
 	CMP COUNTER_END2,0
-	JE PLAYER2_WON
+	JE PLAYERWON
 	
 	JMP CHECK_TIME ;after everything checks time again
-PLAYER1_WON:  
+
+DUMMY0: ;for jump out of range problem
+jmp GAME_MODE
+
+DUMMY1:
+jmp LABELBACK
+
+PLAYERWON:  
 		MOV AH,0          
 		MOV AL,03h
 		INT 10h 
@@ -284,57 +291,50 @@ PLAYER1_WON:
 		mov dh,5
 		int 10h 
 		
+
+		CMP COUNTER_END1,0
+		jne PLAYER1_DIDNT_WIN
+
 		MOV AH,9
 		LEA DX,player1WON
 		INT 21H
+
+		JMP RESET_won
+		PLAYER1_DIDNT_WIN:
 		
-		mov ah,2        ;move cursor 
-		mov dl,5
-		mov dh,6
-		int 10h 
+		MOV AH,9
+		LEA DX,player2WON
+		INT 21h
 	
+RESET_won:
+        mov ah,2        ;move cursor 
+		mov dl,10
+		mov dh,10
+		int 10h 
 		MOV AH,9
 		LEA DX,PLAY_AGIAN 
 		INT 21H
 		
+	mov COUNTER_END1,MAX_SCORE
+	mov COUNTER_END2,MAX_SCORE
+
+	mov PLAYER1_SCORE,0
+	mov PLAYER2_SCORE,0
+	
 		MOV AH,0
 		INT 16H
-		CMP AL,31H
-		;je far start_game       ;OUT OF RANGE
-		jmp control_dos
+		
 
-PLAYER2_WON:
-	MOV AH,0          
-	MOV AL,03h
-	INT 10h 
-
-	mov ah,2        ;move cursor 
-	mov dl,5
-	mov dh,5
-	int 10h 
-	
-	MOV AH,9
-	LEA DX,player2WON
-	INT 21H
-			
-	mov ah,2        ;move cursor 
-	mov dl,5
-	mov dh,6
-	int 10h 
-
-	MOV AH,9
-	LEA DX,PLAY_AGIAN 
-	INT 21H
-	
-	MOV AH,0
-	INT 16H
 	CMP AL,31H
+	je  DUMMY0        ;OUT OF RANGE
+	CMP AL,32H
+	je  DUMMY1          ;main menue
+
+jmp control_dos
+
 	
-	MOV AH,0
-	INT 16H
-	CMP AL,31H
-	;je far start_game        ;OUT OF RANGE
-	jmp control_dos
+
+	;;jmp control_dos
 	
 ;return the control to the dos
 control_dos:	
