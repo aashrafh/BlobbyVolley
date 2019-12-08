@@ -536,20 +536,6 @@ MOVE_BALL PROC NEAR
 	CMP AX, 1
 	JE NEG_VELOCITY_Y_PLAYER
 	
-	; ;CHECK_PLAYER_TWO_TOP_Y
-	; MOV AX, PLAYER_TWO_X
-	; MOV BX, PLAYER_TWO_Y
-	; CALL CHECK_PLAYER_TOP_Y			 ;Check collision in the top y-axis
-	; CMP AX, 1
-	; JE NEG_VELOCITY_Y_PLAYER
-	
-	; ;CHECK_PLAYER_TWO_DOWN_Y
-	; MOV AX, PLAYER_TWO_X		     
-	; MOV BX, PLAYER_TWO_Y
-	; CALL CHECK_PLAYER_DOWN_Y	     ;Check collision in the bottom y-axis	
-	; CMP AX, 1
-	; JE NEG_VELOCITY_Y_PLAYER
-	
 	JMP RET_MOVE_BALL
 
 	PLAYER_1_PLAYGROUND:
@@ -569,17 +555,6 @@ MOVE_BALL PROC NEAR
 		CALL INCREASE_SCORE_PLAYER1
 
 		JMP RET_MOVE_BALL
-
-	;this is a feature for the ball after it hit a player's playground
-	;MOVE_TO_PLAYGROUND_1:
-	;MOV BALL_X, 30
-	;MOV BALL_Y, 30
-	;JMP RET_MOVE_BALL
-	
-	;MOVE_TO_PLAYGROUND_2:
-	;MOV BALL_X, (WINDOW_WIDTH-30)
-	;MOV BALL_Y, 30
-	;JMP RET_MOVE_BALL
 	
 	NEG_VELOCITY_Y:
 		NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
@@ -970,122 +945,6 @@ CHECK_PLAYER_TWO_PLAYGROUND PROC NEAR         ;Check if the first player attack 
 	RET 
 CHECK_PLAYER_TWO_PLAYGROUND ENDP
 ;-------------------------------------------------------------------------------	
-CHECK_PLAYER_X PROC NEAR    ;Detect collision in the x-axis
-	MOV PLAYER_X, AX 		;X of the specified player (first or second)
-	MOV PLAYER_Y, BX		;Y of the specified player (first or second)
-	MOV AX, 0				;flag
-	;Check collision from left
-	MOV DX, PLAYER_X
-	ADD DX, LIMIT
-	SUB DX, BALL_SIZE
-	CMP BALL_X, DX			;If there is a left collision then => BALL_X = PLAYER_X - BALL_SIZE
-	JB RET_CHECK_PLAYER_X   ;Below = far = no collision
-	
-	;Check collision from right
-	MOV DX, PLAYER_X
-	ADD DX, PLAYER_WIDTH
-	ADD DX, LIMIT
-	ADD DX, BALL_SIZE
-	CMP BALL_X, DX			;If there is a left collision then => BALL_X = PLAYER_X + PLAYER_WIDTH + BALL_SIZE
-	JA RET_CHECK_PLAYER_X   ;Above = far = no collision
-	
-	;If there is a collision in the x-axis then we need one more check
-	;We have to check the y boundaries
-	MOV DX, PLAYER_Y
-	ADD DX, LIMIT
-	CMP BALL_Y, DX			
-	JB RET_CHECK_PLAYER_X	;above the the player = no collision
-	
-	MOV DX, PLAYER_Y
-	ADD DX, PLAYER_HIGHT
-	ADD DX, LIMIT
-	CMP BALL_Y, DX
-	JA RET_CHECK_PLAYER_X 	;below the the player = no collision
-	
-	MOV AX, 1				;there is a collision
-	RET_CHECK_PLAYER_X:
-	RET 
-CHECK_PLAYER_X ENDP
-;-------------------------------------------------------------------------------	
-CHECK_PLAYER_TOP_Y PROC NEAR	;Detect collision in the y-axis from top
-	MOV PLAYER_X, AX			;X of the specified player (first or second)
-	MOV PLAYER_Y, BX			;Y of the specified player (first or second)
-	MOV AX, 0					;flag
-	
-	;Check X boundraies same as CHECK_PLAYER_X
-	MOV DX, PLAYER_X
-	SUB DX, BALL_SIZE
-	CMP BALL_X, DX
-	JB RET_CHECK_PLAYER_TOP_Y
-	
-	MOV DX, PLAYER_X
-	ADD DX, PLAYER_WIDTH
-	ADD DX, BALL_SIZE
-	CMP BALL_X, DX 
-	JA RET_CHECK_PLAYER_TOP_Y
-	
-	;Then we nead to validate the collision in the top y
-	;to be a valid collision this satement should be satisfied
-	;PLAYER_Y <= BALL_Y <= PLAYER_Y + PLAYER_HIGHT
-	;AND
-	;PLAYER_Y <= BALL_Y + BALL_SIZE <= PLAYER_Y + PLAYER_HIGHT
-	MOV DX, PLAYER_Y
-	SUB DX, LIMIT
-	CMP BALL_Y, DX
-	JB RET_CHECK_PLAYER_TOP_Y	;Above the player
-	
-	MOV DX, PLAYER_Y
-	ADD DX, LIMIT
-	ADD DX, BALL_SIZE
-	CMP BALL_Y, DX
-	JA RET_CHECK_PLAYER_TOP_Y	;Below the Player
-	
-	MOV AX, 1					;there is a collision
-	RET_CHECK_PLAYER_TOP_Y:
-	RET 
-CHECK_PLAYER_TOP_Y ENDP
-;------------------------------------------------------------------------------------	
-CHECK_PLAYER_DOWN_Y PROC NEAR	;Detect collision in the y-axis from top
-	MOV PLAYER_X, AX			;X of the specified player (first or second)
-	MOV PLAYER_Y, BX			;Y of the specified player (first or second)
-	MOV AX, 0					;flag
-	
-	;Check X boundraies same as CHECK_PLAYER_X
-	MOV DX, PLAYER_X
-	SUB DX, BALL_SIZE
-	SUB DX, LIMIT
-	CMP BALL_X, DX
-	JB RET_CHECK_PLAYER_DOWN_Y
-	
-	MOV DX, PLAYER_X
-	ADD DX, PLAYER_WIDTH
-	ADD DX, LIMIT
-	ADD DX, BALL_SIZE
-	CMP BALL_X, DX 
-	JA RET_CHECK_PLAYER_DOWN_Y
-	
-	;Then we nead to validate the collision in the top y
-	;to be a valid collision this satement should be satisfied
-	;PLAYER_Y <= BALL_Y <= PLAYER_Y + PLAYER_HIGHT
-	;AND
-	;PLAYER_Y <= BALL_Y + BALL_SIZE <= PLAYER_Y + PLAYER_HIGHT
-	MOV DX, PLAYER_Y
-	ADD DX, PLAYER_HIGHT
-	SUB DX, LIMIT
-	SUB DX, BALL_SIZE
-	CMP BALL_Y, DX
-	JB RET_CHECK_PLAYER_DOWN_Y	;Above the player
-	
-	MOV DX, PLAYER_Y
-	ADD DX, PLAYER_HIGHT
-	ADD DX, LIMIT
-	CMP BALL_Y, DX
-	JA RET_CHECK_PLAYER_DOWN_Y	;Below the player
-	
-	MOV AX, 1
-	RET_CHECK_PLAYER_DOWN_Y:
-	RET 
-CHECK_PLAYER_DOWN_Y ENDP
 	
 	
 ;intialize score
