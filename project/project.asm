@@ -25,8 +25,8 @@ TIME_AUX DB 0 ;variable used when checking if the time has changed
 BALL_X DW 30 ;X start position (column) of the ball 
 BALL_Y DW 100 ;Y start position (line) of the ball
 BALL_SIZE EQU 04 ;size of the ball (how many pixels does the ball have in width and height)
-BALL_VELOCITY_X DW 04 ;X (horizontal) velocity of the ball
-BALL_VELOCITY_Y DW 04 ;Y (vertical) velocity of the ball
+BALL_VELOCITY_X DW 03 ;X (horizontal) velocity of the ball
+BALL_VELOCITY_Y DW 03 ;Y (vertical) velocity of the ball
 	
 ;wall data
 WALL_X EQU (WINDOW_WIDTH_HALF - WALL_WIDTH_HALF)
@@ -388,7 +388,7 @@ MOVE_BALL PROC NEAR
 	
 	MOV AX, 4
 	MOV BX, 0
-	MOV CX, 10
+	MOV CX, 8
 	MOV DX, 160
 	CALL CHECK_INSIDE_THIS_AREA 
 	CMP SI, 1                         
@@ -396,7 +396,7 @@ MOVE_BALL PROC NEAR
 	
 	MOV AX, 320
 	MOV BX, 316 ;320 - 4(ball size)
-	MOV CX, 10
+	MOV CX, 8
 	MOV DX, 160
 	CALL CHECK_INSIDE_THIS_AREA 
 	CMP SI, 1                         
@@ -453,8 +453,8 @@ MOVE_BALL PROC NEAR
 	;check top of the play window
 	MOV AX, 320
 	MOV BX, 0
-	MOV CX, 0
-	MOV DX, 10
+	MOV CX, 8
+	MOV DX, (8 + 4)
 	CALL CHECK_INSIDE_THIS_AREA 
 	CMP SI, 1                         
 	JE NEG_VELOCITY_Y_1       
@@ -815,10 +815,10 @@ movePlayer2 ENDP
 ;  \___| |_||_| |___|  \___| |_|\_\
 ;CHECK_BALL_INSIDE_THIS_AREA
 ;INPUT: 
-;AX = X RIGHT
-;BX = X LEFT
-;CX = Y UP
-;DX = Y DOWN
+;AX = WINDOW X RIGHT
+;BX = WINDOW X LEFT
+;CX = WINDOW Y UP
+;DX = WINDOW Y DOWN
 ;OUTPUT:
 ;SI = 1 -> INSIDE
 ;SI = 0 -> OUTSIDE
