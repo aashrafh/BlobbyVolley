@@ -110,10 +110,19 @@
 	;player common attributes
 	PLAYER_X DW ?
 	PLAYER_Y DW ?
-	PLAYER_WIDTH DW 21 			;size of the player in X direction
-	PLAYER_HIGHT DW 24 			;size of the player in Y direction
-	PLAYER_VELOCITY_X DW 21      	;X (horizontal) velocity of the player
-	PLAYER_VELOCITY_Y DW 24    	;Y (vertical) velocity of the player
+	PLAYER_WIDTH DW 22 			;size of the player in X direction
+	PLAYER_HIGHT DW 25 			;size of the player in Y direction
+	PLAYER_VELOCITY_X DW 1     	;X (horizontal) velocity of the player
+	PLAYER_VELOCITY_Y DW 1    	;Y (vertical) velocity of the player
+    PLAYER_OUTER_VELOCITY DW 10
+   
+
+
+    D_X  DW 00             ;change in x direction
+    D_Y  DW 00             ;change in y ditecttion  
+	
+    D_X_2  DW 00             ;change in x direction
+    D_Y_2  DW 00             ;change in y ditecttion  
 
 	;player one playground
 	PLAYER_ONE_PLAYGROUND_X_START EQU BALL_SIZE
@@ -578,115 +587,124 @@
 	 ;|  _/ | |__   / _ \   \ V /  | _|  |   /       | |
 	 ;|_|   |____| /_/ \_\   |_|   |___| |_|_\  ___  |_|
 	 ;                                         |___|                                  
+;------------------------------------------------------------	
 	movePlayer1 PROC near 
-		;READ CHARACTER FROM KEYBOARD
-		mov ah,1
-		int 16h
-		JZ DONE1
-		; mov ah,0
-		; int 16h
+	;READ CHARACTER FROM KEYBOARD
+	mov ah,1
+	int 16h
+	JZ DONE1
+	; mov ah,0
+	; int 16h
+
+	
+	mov bl ,al
+	;down
+	CMP aL, 's'
+	JZ DOWN
+	;Up
+	CMP aL, 'w'
+	JZ up
+	;Left
+	CMP aL, 'a'
+	JZ left
+	;Right
+	CMP aL, 'd'
+	JZ Right
+	
+	JMP DEFAULT
+	
+	Right:
+		mov ax , 0
+		inc ax
+		mov [D_X],ax
 		
-		mov SI , PLAYER_ONE_X
-		mov DI , PLAYER_ONE_Y
 		
-		mov [OLD_X_Player1],SI
-		mov [OLD_Y_Player1],DI
+		MOV AX ,PLAYER_WIDTH
+		ADD AX ,PLAYER_ONE_X
 		
-		mov bl ,al
-		;down
-		CMP aL, 's'
-		JZ DOWN
-		;Up
-		CMP aL, 'w'
-		JZ up
-		;Left
-		CMP aL, 'a'
-		JZ left
-		;Right
-		CMP aL, 'd'
-		JZ Right
+		;check wall
+		CMP AX , (WALL_X-5)
+		JG DEFAULT
+	
+		DONE1:
 		
-		JMP DEFAULT
+		jmp DONE
+	Left:
+	    mov ax , 0
+		dec ax
+		mov [D_X],ax
 		
-		Right:
+		;check left screen
+		MOV AX ,PLAYER_ONE_X
+		CMP AX , 10
+		JL DEFAULT
+		
+		jmp DONE
+	Up:
+		mov ax , 0
+		dec ax
+		mov [D_Y],ax
+		
+		MOV AX , PLAYER_ONE_Y
+		CMP AX , 20
+		
+		JL DEFAULT
+		
+		jmp DONE
+	DOWN:
+		mov ax , 0
+			inc ax
+			mov [D_Y],ax
 			
-			MOV AX,PLAYER_VELOCITY_X
-			ADD PLAYER_ONE_X,AX
-			;avoid crossing the barrier
-			MOV AX, PLAYER_ONE_X
-			ADD AX, WIN_LIMIT
-			CMP AX, 135
-			JG DECREASEX
-		
-			DONE1:
+			MOV AX ,PLAYER_ONE_Y
+			ADD AX ,PLAYER_HIGHT
+			CMP AX , 155 
+			
+			JA DEFAULT
 			
 			jmp DONE
-		Left:
-			
-			MOV AX,PLAYER_VELOCITY_X
-			SUB PLAYER_ONE_X,AX
-			MOV AX, WIN_LIMIT
-			CMP PLAYER_ONE_X, AX
-			JL INCREASEX
-			
-			jmp DONE
-		Up:
-			
-			MOV AX,PLAYER_VELOCITY_Y
-			SUB PLAYER_ONE_Y,AX
-			CMP PLAYER_ONE_Y, WIN_LIMIT
-			JL INCREASEY
-			
-			jmp DONE
-		DOWN:
-			
-			MOV AX, PLAYER_VELOCITY_Y
-			ADD PLAYER_ONE_Y,AX
-			MOV BX, 159
-			SUB BX, WIN_LIMIT
-			CMP PLAYER_ONE_Y, BX
-			JA DECREASEY
-			
-			jmp DONE
+	DEFAULT: 
+		jmp DONEALL
+	
+	
+	DONE:	
+	
 		
-		DEFAULT: 
-			jmp DONEALL
-		
-		DECREASEX:
-			MOV AX, PLAYER_VELOCITY_X;
-			SUB PLAYER_ONE_X, AX
+    
+	mov cx ,00     ;intialize counter for change loop 
+	
+	;this loop moves the player pixel by Pixel
+	Change:
+	        
 			
-			jmp DONEALL
-		INCREASEX: 
-			MOV AX, PLAYER_VELOCITY_X;
-			ADD PLAYER_ONE_X, AX
+			Draw PLAYER1 , (PLAYER_ONE_X) , (PLAYER_ONE_Y) ,PLAYER_WIDTH ,PLAYER_HIGHT
+
+			mov SI , PLAYER_ONE_X
+			add SI , D_X
+			mov [PLAYER_ONE_X] , SI
 			
-			jmp DONEALL
-		INCREASEY: 
-			ADD PLAYER_ONE_Y, AX
+		    mov SI , PLAYER_ONE_Y
+			add SI , D_Y
+			mov [PLAYER_ONE_Y] , SI
 			
-			jmp DONEALL
-		DECREASEY:
-			SUB PLAYER_ONE_Y, AX
-		
-			jmp DONEALL
+			inc cx
+            Cmp cx , PLAYER_OUTER_VELOCITY
+			je DONEALL
 			
-		DONE:	
-			mov ax , PLAYER_ONE_X 
-			add ax , PLAYER_ONE_Y
-			
-			sub ax , OLD_X_Player1
-			sub ax , OLD_Y_Player1		  
-		
-			and ax ,ax 
-			
-			jz DONEALL  
-			CLEAR 11, OLD_X_Player1 ,OLD_Y_Player1, PLAYER_WIDTH, PLAYER_HIGHT
 				
-		DONEALL:
-			RET
-	movePlayer1 ENDP
-	; __  __    ___   __   __  ___ 
+            jmp change	
+		
+		
+			
+	DONEALL:
+	    ;CLEAR 11, OLD_X_Player1 ,OLD_Y_Player1, PLAYER_WIDTH,PLAYER_HIGHT
+	    mov ax ,00
+	    mov [D_X] ,ax
+	    mov [D_Y] ,ax
+		RET
+movePlayer1 ENDP
+;--------------------------------------------------------------------
+	 ; __  __    ___   __   __  ___ 
 	 ;|  \/  |  / _ \  \ \ / / | __|
 	 ;| |\/| | | (_) |  \ V /  | _| 
 	 ;|_|  |_|  \___/    \_/   |___|
@@ -695,6 +713,7 @@
 	 ;|  _/ | |__   / _ \   \ V /  | _|  |   /        / / 
 	 ;|_|   |____| /_/ \_\   |_|   |___| |_|_\  ___  /___|
 	 ;                                         |___|      
+
 
 	movePlayer2 PROC NEAR
 
@@ -729,84 +748,93 @@
 		
 		Right2:
 			
-			MOV AX,PLAYER_VELOCITY_X
-			ADD PLAYER_TWO_X,AX
-			;avoid crossing the barrier
-			MOV BX, PLAYER_TWO_X
-			ADD BX, WIN_LIMIT
-			CMP BX, 310
-			JG DECREASEX2
-		
+			mov ax , 0
+			inc ax
+			mov [D_X_2],ax
+			
+			ADD AX ,PLAYER_TWO_X
+			ADD AX ,PLAYER_WIDTH
+			
+			;check wall
+			CMP AX ,310 
+			JG DEFAULT2
+			
 			DONE_2:
 			
 			jmp DONE2
 		Left2:
 			
-			MOV AX,PLAYER_VELOCITY_X
-			sub PLAYER_TWO_X,AX
-			MOV AX, 165
-			ADD AX, WIN_LIMIT
-			CMP PLAYER_TWO_X, AX
-			JL INCREASEX2
+		    mov ax , 0
+			dec ax
+			mov [D_X_2],ax
+			
+			;check left screen
+			MOV AX ,PLAYER_TWO_X
+	        
+			CMP AX , (WALL_X+WALL_WIDTH+5)
+			JL DEFAULT2
 			
 			jmp DONE2
 		Up2:
 			
-			MOV AX,PLAYER_VELOCITY_Y
-			SUB PLAYER_TWO_Y,AX
-			CMP PLAYER_TWO_Y, WIN_LIMIT
-			JL INCREASEY2
+			mov ax , 0
+			dec ax
+			mov [D_Y_2],ax
 			
+			MOV AX , PLAYER_TWO_Y
+			CMP AX , 20
+			
+		    JL DEFAULT2
+		
 			jmp DONE2
 		DOWN2:
 			
-			MOV AX, PLAYER_VELOCITY_Y
-			ADD PLAYER_TWO_Y,AX
-			MOV BX, 159
-			SUB BX, WIN_LIMIT
-			CMP PLAYER_TWO_Y, BX
-			JA DECREASEY2
+			mov ax , 0
+			inc ax
+			mov [D_Y_2],ax
+			
+			MOV AX ,PLAYER_TWO_Y
+			ADD AX ,PLAYER_HIGHT
+			CMP AX , 155 
+			
+			JA DEFAULT2
 			
 			jmp DONE2
 		
 		DEFAULT2: 
 			jmp DONEALL2
 		
-		DECREASEX2:
-			MOV AX, PLAYER_VELOCITY_X;
-			sub PLAYER_TWO_X, AX
-			
-			jmp DONE2
-		INCREASEX2: 
-			MOV AX, PLAYER_VELOCITY_X;
-			ADD PLAYER_TWO_X, AX
-			
-			
-			jmp DONE2
-		INCREASEY2: 
-			ADD PLAYER_TWO_Y, AX
-			
-			jmp DONE2
-		DECREASEY2:
-			SUB PLAYER_TWO_Y, AX
 		
-			jmp DONE2
-			
 		DONE2:		
 			
-			mov ax , PLAYER_TWO_X 
-			add ax , PLAYER_TWO_Y
 			
-			sub ax , OLD_X_Player2
-			sub ax , OLD_Y_Player2		  
-		
-			and ax ,ax 
+		mov cx ,00	
+		Change2:
+	        
 			
-			jz DONEALL2  
-			CLEAR 11, OLD_X_Player2 ,OLD_Y_Player2, PLAYER_WIDTH, PLAYER_HIGHT
+			Draw PLAYER2 , (PLAYER_TWO_X) , (PLAYER_TWO_Y) ,PLAYER_WIDTH ,PLAYER_HIGHT
+
+			mov SI , PLAYER_TWO_X
+			add SI , D_X_2
+			mov [PLAYER_TWO_X] , SI
+			
+		    mov SI , PLAYER_TWO_Y
+			add SI , D_Y_2
+			mov [PLAYER_TWO_Y] , SI
+			
+			inc cx
+            Cmp cx , PLAYER_OUTER_VELOCITY
+			je DONEALL2
+			
+				
+            jmp change2	
+			
 
 		DONEALL2:
-		RET
+		  mov ax ,00
+	      mov [D_X_2] ,ax
+	      mov [D_Y_2] ,ax
+		  RET
 	movePlayer2 ENDP
 	;---------------------------------------------------------------------------	
 	;   ___   _  _   ___    ___   _  __
