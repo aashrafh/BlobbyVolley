@@ -40,7 +40,7 @@
 	;score and chat data
 	PLAYER1_SCORE db 0
 	PLAYER2_SCORE db 0
-	MAX_SCORE EQU  2
+	MAX_SCORE EQU  10
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
 
