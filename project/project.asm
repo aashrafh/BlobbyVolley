@@ -40,7 +40,7 @@
 	;score and chat data
 	PLAYER1_SCORE db 0
 	PLAYER2_SCORE db 0
-	MAX_SCORE EQU  200
+	MAX_SCORE EQU  2
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
 
@@ -51,8 +51,8 @@
 
 
 	WON_SIZE        EQU 10
-	player1WON      DB 'PLAYER1 IS WINNWER','$'
-	player2WON      DB 'PLAYER2 IS WINNWER','$'
+	player1WON      DB 'PLAYER 1 IS WINNWER','$'
+	player2WON      DB 'PLAYER 2 IS WINNWER','$'
 	Border          db '------------------------------------------------------------------------------------------------------'
 	CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME  ' 
 	PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN 2 TO MAIN MAINMENUE','$'
@@ -251,7 +251,14 @@
 
 	CHECK_TIME:
 		; add f4=>check to exit game(3Eh)
-			
+		;Uncomment for F4 feature
+		;mov ah,1
+		;int 16h
+
+		;JNZ DUMMY2
+
+		;CHECK_TIME_CONTINUE:
+
 		MOV AH,2Ch ;get the system time
 		INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
 		
@@ -263,6 +270,12 @@
 		
 		;DRAW the Wall
 		DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
+
+		;Uncomment for F4 feature
+		;JMP CONTINUE
+		;DUMMY2:
+		;JMP PRESSED_A_BUTTON
+		;CONTINUE:
 
 		; Draw Players 
 		DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
@@ -278,73 +291,85 @@
 		DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		 ; CALL DRAW_BALL / yellow 
 		
 		CMP COUNTER_END1,0
-		JE PLAYER1_WON
+		JE PLAYERWON
 		CMP COUNTER_END2,0
-		JE PLAYER2_WON
+		JE PLAYERWON
 		
 		JMP CHECK_TIME ;after everything checks time again
-	PLAYER1_WON:  
-			MOV AH,0          
-			MOV AL,03h
-			INT 10h 
-			
-			mov ah,2        ;move cursor 
-			mov dl,5
-			mov dh,5
-			int 10h 
-			
-			MOV AH,9
-			LEA DX,player1WON
-			INT 21H
-			
-			mov ah,2        ;move cursor 
-			mov dl,5
-			mov dh,6
-			int 10h 
 		
-			MOV AH,9
-			LEA DX,PLAY_AGIAN 
-			INT 21H
-			
-			MOV AH,0
-			INT 16H
-			CMP AL,31H
-			;je far start_game       ;OUT OF RANGE
-			jmp control_dos
+		;Uncomment for F4 feature
+		;PRESSED_A_BUTTON:
+		;CMP AH, 3Eh
+		;JE IS_F4
 
-	PLAYER2_WON:
+		;JMP CHECK_TIME_CONTINUE
+		
+		;IS_F4:
+		;;consume the char
+		;mov ah, 0
+		;int 16h
+		;mov COUNTER_END1,MAX_SCORE
+		;mov COUNTER_END2,MAX_SCORE
+
+		;mov PLAYER1_SCORE,0
+		;mov PLAYER2_SCORE,0
+		
+		;JMP LABELBACK
+
+		DUMMY0: ;for jump out of range problem
+		jmp GAME_MODE
+
+		DUMMY1:
+		jmp LABELBACK
+
+	PLAYERWON:  
 		MOV AH,0          
 		MOV AL,03h
 		INT 10h 
-
+		
 		mov ah,2        ;move cursor 
 		mov dl,5
 		mov dh,5
 		int 10h 
 		
+
+		CMP COUNTER_END1,0
+		jne PLAYER1_DIDNT_WIN
+
+		MOV AH,9
+		LEA DX,player1WON
+		INT 21H
+
+		JMP RESET_won
+		PLAYER1_DIDNT_WIN:
+		
 		MOV AH,9
 		LEA DX,player2WON
-		INT 21H
-				
-		mov ah,2        ;move cursor 
-		mov dl,5
-		mov dh,6
+		INT 21h
+	
+		RESET_won:
+        mov ah,2        ;move cursor 
+		mov dl,10
+		mov dh,10
 		int 10h 
-
 		MOV AH,9
 		LEA DX,PLAY_AGIAN 
 		INT 21H
 		
-		MOV AH,0
-		INT 16H
-		CMP AL,31H
-		
-		MOV AH,0
-		INT 16H
-		CMP AL,31H
-		;je far start_game        ;OUT OF RANGE
-		jmp control_dos
-		
+	mov COUNTER_END1,MAX_SCORE
+	mov COUNTER_END2,MAX_SCORE
+
+	mov PLAYER1_SCORE,0
+	mov PLAYER2_SCORE,0
+	
+	MOV AH,0
+	INT 16H
+
+	CMP AL,31H
+	je  DUMMY0        ;OUT OF RANGE
+	CMP AL,32H
+	je  DUMMY1          ;main menue
+
 	;return the control to the dos
 	control_dos:	
 		MOV AH, 4CH
