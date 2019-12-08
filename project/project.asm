@@ -40,7 +40,7 @@
 	;score and chat data
 	PLAYER1_SCORE db 0
 	PLAYER2_SCORE db 0
-	MAX_SCORE EQU  2
+	MAX_SCORE EQU  6
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
 
@@ -112,8 +112,8 @@
 	PLAYER_Y DW ?
 	PLAYER_WIDTH DW 22 			;size of the player in X direction
 	PLAYER_HIGHT DW 25 			;size of the player in Y direction
-	PLAYER_VELOCITY_X DW 10     	;X (horizontal) velocity of the player
-	PLAYER_VELOCITY_Y DW 10    	;Y (vertical) velocity of the player
+	PLAYER_VELOCITY_X DW 1     	;X (horizontal) velocity of the player
+	PLAYER_VELOCITY_Y DW 1    	;Y (vertical) velocity of the player
     PLAYER_OUTER_VELOCITY DW 10
    
 
