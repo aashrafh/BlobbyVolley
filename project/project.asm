@@ -96,16 +96,16 @@
 				 
 	;player 1 data        
 	PLAYER_ONE_X DW  WIN_LIMIT			;X position of the first player
-	PLAYER_ONE_Y DW 136			;Y position of the first player
+	PLAYER_ONE_Y DW 135		;Y position of the first player
 	OLD_X_Player1 DW WIN_LIMIT
-	OLD_Y_Player1 DW 136 
+	OLD_Y_Player1 DW 135 
 	TEMP_MOVE_1   DW 00
 
 	;player 2        
 	PLAYER_TWO_X DW  (270-WIN_LIMIT)			;X position of the second player
-	PLAYER_TWO_Y DW  136			;Y position of the second player
+	PLAYER_TWO_Y DW  135			;Y position of the second player
 	OLD_X_Player2 DW (270-WIN_LIMIT)
-	OLD_Y_Player2 DW 136 
+	OLD_Y_Player2 DW 135 
 
 	;player common attributes
 	PLAYER_X DW ?
@@ -756,7 +756,7 @@ movePlayer1 ENDP
 			ADD AX ,PLAYER_WIDTH
 			
 			;check wall
-			CMP AX ,310 
+			CMP AX ,315
 			JG DEFAULT2
 			
 			DONE_2:
