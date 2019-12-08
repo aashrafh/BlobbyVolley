@@ -29,6 +29,7 @@ EndM CLEAR
 ;---------------------------------------------------------------------------
 DRAW MACRO COLOR, X, Y, WIDTH, HIGHT
 	LOCAL outerloop, innerloop
+push CX
 	 mov  SI , offset COLOR
      mov  bh , 0   ;DisplayPage doesn't change	 
      mov  Dx , Y;start Y for WALL
@@ -57,6 +58,7 @@ DRAW MACRO COLOR, X, Y, WIDTH, HIGHT
         inc dx
         cmp dx  ,BX ; the end Y for WALL
         jbe  outerloop	
+pop cx
 ENDM DRAW
 print MACRO  message,size, x, y ,color
 
