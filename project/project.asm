@@ -51,8 +51,8 @@ CHAT2           DB ':CHAT WILL BE IN PHASE 2'
 
 
 WON_SIZE        EQU 10
-player1WON      DB 'PLAYER1 IS WINNWER','$'
-player2WON      DB 'PLAYER2 IS WINNWER','$'
+player1WON      DB 'PLAYER 1 IS WINNWER','$'
+player2WON      DB 'PLAYER 2 IS WINNWER','$'
 Border          db '------------------------------------------------------------------------------------------------------'
 CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME  ' 
 PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN 2 TO MAIN MAINMENUE','$'
@@ -167,10 +167,10 @@ JNE drawLoop
     call CloseFile
 
 ;--------------------------------------------------------------end read data and draw----------------------------------------------------------------
-print COMMAND_ONE,CMD,3,1,01
-print COMMAND_ONE_C,CMD,2,3,01
-print COMMAND_TWO,CMD,3,10,01
-print COMMAND_TWO_C,CMD,2,12,01	
+print COMMAND_ONE,CMD,3,1,4
+print COMMAND_ONE_C,CMD,2,3,4
+print COMMAND_TWO,CMD,3,10,4
+print COMMAND_TWO_C,CMD,2,12,4	
 	
 	
 DEFAULTG:  
@@ -230,19 +230,25 @@ start_game:
 	 
      ;print player names and chat
 	 print PLAYERNAME_1,NAME_SIZE,0,0,10
-     print PLAYERNAME_2,NAME_SIZE,34,0,110
+     print PLAYERNAME_2,NAME_SIZE,24,0,110
 	 
-	 PRINT PLAYERNAME_1,NAME_SIZE,0,21,01
+	 PRINT PLAYERNAME_1,NAME_SIZE,0,21,10
 	 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21,01
 	 
-	 PRINT PLAYERNAME_2,NAME_SIZE,0,22,01
+	 PRINT PLAYERNAME_2,NAME_SIZE,0,22,110
 	 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22,01	
 	 PRINT BORDER,40,0,23,01
 	 PRINT CLOSE_GAME,24,0,24,01
 
 CHECK_TIME:
 	; add f4=>check to exit game(3Eh)
-		
+	mov ah,1
+	int 16h
+    
+	JNZ DUMMY2
+	
+	CHECK_TIME_CONTINUE:
+
 	MOV AH,2Ch ;get the system time
 	INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
 	
@@ -254,6 +260,11 @@ CHECK_TIME:
 	
 	;DRAW the Wall
 	DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
+
+	JMP CONTINUE
+	DUMMY2:
+	JMP PRESSED_A_BUTTON
+	CONTINUE:
 
 	; Draw Players 
 	DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
@@ -271,10 +282,28 @@ CHECK_TIME:
 	CMP COUNTER_END1,0
 	JE PLAYERWON
 	CMP COUNTER_END2,0
-	JE PLAYERWON
-	
+	JE PLAYERWON	
+
 	JMP CHECK_TIME ;after everything checks time again
 
+	PRESSED_A_BUTTON:
+	CMP AH, 3Eh
+	JE IS_F4
+
+	JMP CHECK_TIME_CONTINUE
+	 
+	IS_F4:
+	;consume the char
+	mov ah, 0
+	int 16h
+	mov COUNTER_END1,MAX_SCORE
+	mov COUNTER_END2,MAX_SCORE
+
+	mov PLAYER1_SCORE,0
+	mov PLAYER2_SCORE,0
+	
+	JMP LABELBACK
+	
 DUMMY0: ;for jump out of range problem
 jmp GAME_MODE
 
