@@ -102,7 +102,7 @@
 	TEMP_MOVE_1   DW 00
 
 	;player 2        
-	PLAYER_TWO_X DW  (270-WIN_LIMIT)			;X position of the second player
+	PLAYER_TWO_X DW  (269-WIN_LIMIT)			;X position of the second player
 	PLAYER_TWO_Y DW  135			;Y position of the second player
 	OLD_X_Player2 DW (270-WIN_LIMIT)
 	OLD_Y_Player2 DW 135 
@@ -276,19 +276,22 @@
 		;DUMMY2:
 		;JMP PRESSED_A_BUTTON
 		;CONTINUE:
-
+		
+		
 		; Draw Players 
 		DRAW PLAYER1, PLAYER_ONE_X, PLAYER_ONE_Y, PLAYER_WIDTH, PLAYER_HIGHT    
 		DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT
 		;call DISPLAY_NAME 
-		; Move Players
-		CALL movePlayer1  ;move for player1 
-		CALL movePlayer2  ;move for player2 
 		
 		;Move BALL and Draw it
 		CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
 		CALL MOVE_BALL
-		DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		 ; CALL DRAW_BALL / yellow 
+		DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		 ; CALL DRAW_BALL / yellow
+		
+		
+		; Move Players
+		CALL movePlayer1  ;move for player1 
+		CALL movePlayer2  ;move for player2  
 		
 		CMP COUNTER_END1,0
 		JE PLAYERWON
