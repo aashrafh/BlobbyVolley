@@ -624,16 +624,16 @@
 	
 	mov bl ,al
 	;down
-	CMP aL, 's'
+	CMP AX, 1F73H
 	JZ DOWN
 	;Up
-	CMP aL, 'w'
+	CMP AX, 1177H
 	JZ up
 	;Left
-	CMP aL, 'a'
+	CMP AX, 1E61H
 	JZ left
 	;Right
-	CMP aL, 'd'
+	CMP AX, 2064H
 	JZ Right
 	
 	JMP DEFAULT
