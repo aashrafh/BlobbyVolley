@@ -422,14 +422,14 @@ MOVE_BALL PROC NEAR
 	;CHECK_PLAYER_ONE_X
 	MOV AX, PLAYER_ONE_X
 	MOV BX, PLAYER_ONE_Y
-	CALL CHECK_PLAYER_X					;Check collision in the x-axis
+	CALL CHECK_COL					;Check collision in the x-axis
 	CMP AX, 1
 	JE NEG_VELOCITY_X_PLAYER
 	
 	;CHECK_PLAYER_TWO_X
 	MOV AX, PLAYER_TWO_X
 	MOV BX, PLAYER_TWO_Y
-	CALL CHECK_PLAYER_X                ;Check collision in the x-axis
+	CALL CHECK_COL                ;Check collision in the x-axis
 	CMP AX, 1
 	JE NEG_VELOCITY_X_PLAYER
 	
@@ -493,33 +493,33 @@ MOVE_BALL PROC NEAR
 	JMP NEG_VELOCITY_Y
 
 	SKIP_1:
-	;CHECK_PLAYER_ONE_TOP_Y
+	;CHECK_PLAYER_ONE_Y
 	MOV AX, PLAYER_ONE_X
 	MOV BX, PLAYER_ONE_Y
-	CALL CHECK_PLAYER_TOP_Y          ;Check collision in the top y-axis
+	CALL CHECK_COL          ;Check collision in the top y-axis
 	CMP AX, 1
 	JE NEG_VELOCITY_Y_PLAYER
 	
-	;CHECK_PLAYER_ONE_DOWN_Y
-	MOV AX, PLAYER_ONE_X
-	MOV BX, PLAYER_ONE_Y
-	CALL CHECK_PLAYER_DOWN_Y         ;Check collision in the bottom y-axis
-	CMP AX, 1
-	JE NEG_VELOCITY_Y_PLAYER
+	; ;CHECK_PLAYER_ONE_DOWN_Y
+	; MOV AX, PLAYER_ONE_X
+	; MOV BX, PLAYER_ONE_Y
+	; CALL CHECK_PLAYER_DOWN_Y         ;Check collision in the bottom y-axis
+	; CMP AX, 1
+	; JE NEG_VELOCITY_Y_PLAYER
 	
-	;CHECK_PLAYER_TWO_TOP_Y
+	;CHECK_PLAYER_TWO_Y
 	MOV AX, PLAYER_TWO_X
 	MOV BX, PLAYER_TWO_Y
-	CALL CHECK_PLAYER_TOP_Y			 ;Check collision in the top y-axis
+	CALL CHECK_COL			 ;Check collision in the top y-axis
 	CMP AX, 1
 	JE NEG_VELOCITY_Y_PLAYER
 	
-	;CHECK_PLAYER_TWO_DOWN_Y
-	MOV AX, PLAYER_TWO_X		     
-	MOV BX, PLAYER_TWO_Y
-	CALL CHECK_PLAYER_DOWN_Y	     ;Check collision in the bottom y-axis	
-	CMP AX, 1
-	JE NEG_VELOCITY_Y_PLAYER
+	; ;CHECK_PLAYER_TWO_DOWN_Y
+	; MOV AX, PLAYER_TWO_X		     
+	; MOV BX, PLAYER_TWO_Y
+	; CALL CHECK_PLAYER_DOWN_Y	     ;Check collision in the bottom y-axis	
+	; CMP AX, 1
+	; JE NEG_VELOCITY_Y_PLAYER
 	
 	JMP RET_MOVE_BALL
 
@@ -901,6 +901,44 @@ CHECK_PLAYER_TWO_PLAYGROUND PROC NEAR         ;Check if the first player attack 
 	RET 
 CHECK_PLAYER_TWO_PLAYGROUND ENDP
 ;-------------------------------------------------------------------------------	
+CHECK_COL PROC NEAR
+	MOV PLAYER_X, AX 		;X of the specified player (first or second)
+	MOV PLAYER_Y, BX		;Y of the specified player (first or second)
+	MOV AX, 0				;flag
+	;four cases to achieve collision
+	;if any of them is false
+	;then no collision
+	
+	;first condition: BALL_X < PLAYER_X + PLAYER_WIDTH
+	MOV CX, PLAYER_X
+	ADD CX, PLAYER_WIDTH
+	CMP CX, BALL_X
+	JLE FALSE
+	
+	;second condition: BALL_X + BALL_SIZE > PLAYER_X
+	MOV CX, BALL_SIZE
+	ADD CX, BALL_X
+	CMP CX, PLAYER_X
+	JLE FALSE
+	
+	;third condition: BALL_Y < PLAYER_Y + PLAYER_HIGHT
+	MOV CX, PLAYER_Y
+	ADD CX, PLAYER_HIGHT
+	CMP CX, BALL_Y
+	JLE FALSE
+	
+	;fourth condition: BALL_Y + BALL_SIZE > PLAYER_Y
+	MOV CX, BALL_Y
+	ADD CX, BALL_SIZE
+	CMP CX, PLAYER_Y
+	JLE FALSE
+	
+	;TRUE
+	MOV AX, 1
+	
+	FALSE:
+		RET
+CHECK_COL ENDP
 CHECK_PLAYER_X PROC NEAR    ;Detect collision in the x-axis
 	MOV PLAYER_X, AX 		;X of the specified player (first or second)
 	MOV PLAYER_Y, BX		;Y of the specified player (first or second)
