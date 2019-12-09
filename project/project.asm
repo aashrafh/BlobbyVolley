@@ -42,7 +42,7 @@
 	PLAYER2_SCORE db 0
 
 
-	MAX_SCORE EQU  10
+	MAX_SCORE EQU  4
 
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
@@ -115,8 +115,8 @@
 	PLAYER_Y DW ?
 	PLAYER_WIDTH DW 22 			;size of the player in X direction
 	PLAYER_HIGHT DW 25 			;size of the player in Y direction
-	PLAYER_VELOCITY_X DW 1     	;X (horizontal) velocity of the player
-	PLAYER_VELOCITY_Y DW 1    	;Y (vertical) velocity of the player
+	PLAYER_VELOCITY_X DW 6     	;X (horizontal) velocity of the player
+	PLAYER_VELOCITY_Y DW 3    	;Y (vertical) velocity of the player
     PLAYER_OUTER_VELOCITY DW 10
    
 
@@ -255,12 +255,12 @@
 	CHECK_TIME:
 		; add f4=>check to exit game(3Eh)
 		;Uncomment for F4 feature
-		;mov ah,1
-		;int 16h
+		mov ah,1
+		int 16h
 
-		;JNZ DUMMY2
+		JNZ DUMMY2
 
-		;CHECK_TIME_CONTINUE:
+		CHECK_TIME_CONTINUE:
 
 		MOV AH,2Ch ;get the system time
 		INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
@@ -275,10 +275,10 @@
 		DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
 
 		;Uncomment for F4 feature
-		;JMP CONTINUE
-		;DUMMY2:
-		;JMP PRESSED_A_BUTTON
-		;CONTINUE:
+		JMP CONTINUE
+		DUMMY2:
+		JMP PRESSED_A_BUTTON
+		CONTINUE:
 		
 		
 		; Draw Players 
@@ -304,23 +304,23 @@
 		JMP CHECK_TIME ;after everything checks time again
 		
 		;Uncomment for F4 feature
-		;PRESSED_A_BUTTON:
-		;CMP AH, 3Eh
-		;JE IS_F4
+		PRESSED_A_BUTTON:
+		CMP AH, 3Eh
+		JE IS_F4
 
-		;JMP CHECK_TIME_CONTINUE
+		JMP CHECK_TIME_CONTINUE
 		
-		;IS_F4:
-		;;consume the char
-		;mov ah, 0
-		;int 16h
-		;mov COUNTER_END1,MAX_SCORE
-		;mov COUNTER_END2,MAX_SCORE
+		IS_F4:
+		;consume the char
+		mov ah, 0
+		int 16h
+		mov COUNTER_END1,MAX_SCORE
+		mov COUNTER_END2,MAX_SCORE
 
-		;mov PLAYER1_SCORE,0
-		;mov PLAYER2_SCORE,0
+		mov PLAYER1_SCORE,0
+		mov PLAYER2_SCORE,0
 		
-		;JMP LABELBACK
+		JMP LABELBACK
 
 		DUMMY0: ;for jump out of range problem
 		jmp GAME_MODE
