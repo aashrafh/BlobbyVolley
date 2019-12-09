@@ -42,7 +42,7 @@
 	PLAYER2_SCORE db 0
 
 
-	MAX_SCORE EQU  2
+	MAX_SCORE EQU  7
 
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
@@ -386,6 +386,7 @@
 		mov dl,10
 		mov dh,10
 		int 10h 
+		
 		MOV AH,9
 		LEA DX,PLAY_AGIAN 
 		INT 21H
@@ -1184,7 +1185,7 @@ movePlayer1 ENDP
 		int 10h    
 
 		;Display the input data in a new location
-		mov dx, offset PLAYERNAME_1 +2
+		mov dx, offset PLAYERNAME_1 +1
 		mov ah, 9
 		int 21h
 		
@@ -1208,7 +1209,7 @@ movePlayer1 ENDP
 		MOV DH,15
 		int 10h  	
 		
-		mov dx, offset PLAYERNAME_2 +2;Display the input data in a new location
+		mov dx, offset PLAYERNAME_2 +1;Display the input data in a new location
 		mov ah, 9
 		int 21h
 		
