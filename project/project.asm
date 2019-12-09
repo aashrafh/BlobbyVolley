@@ -42,7 +42,7 @@
 	PLAYER2_SCORE db 0
 
 
-	MAX_SCORE EQU  4
+	MAX_SCORE EQU  2
 
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
@@ -54,8 +54,34 @@
 
 
 	WON_SIZE        EQU 10
-	player1WON      DB 'PLAYER 1 IS WINNWER','$'
-	player2WON      DB 'PLAYER 2 IS WINNWER','$'
+ 
+	
+	player1WON       db 'PLAYER 1 IS WINNER','$' 
+	player2WON       db 'PLAYER 2 IS WINNER','$'
+	
+	; player1WON     db'__________.____                                 ____   __      __'              
+                   ; db'\______   \    |   _____  ___.__. ___________  /_   | /  \    /  \____   ____'  
+                   ; db'|     ___/    |   \__  \<   |  |/ __ \_  __ \   |   | \   \/\/   /  _ \ /    \ '
+                   ; db' |    |   |    |___ / __ \\___  \  ___/|  | \/  |   |  \        (  <_> )   |  \ '
+                   ; db' |____|   |_______ (____  / ____|\___  >__|     |___|   \__/\  / \____/|___|  /'
+                   ; db'                  \/    \/\/         \/                      \/             \/ ' ,'$'
+ 
+
+ 
+	
+	 ;player2WON  db'__________.____                                ________    __      __'              
+				; db'\______   \    |   _____  ___.__. ___________  \_____  \  /  \    /  \____   ____ ' 
+				; db' |     ___/    |   \__  \<   |  |/ __ \_  __ \  /  ____/  \   \/\/   /  _ \ /    \ '
+				; db' |    |   |    |___ / __ \\___  \  ___/|  | \/ /       \   \        (  <_> )   |  \ '
+				; db' |____|   |_______ (____  / ____|\___  >__|    \_______ \   \__/\  / \____/|___|  / '
+				; db'                  \/    \/\/         \/                \/        \/             \/  ','$'
+
+	
+	
+	
+	
+	
+	
 	Border          db '------------------------------------------------------------------------------------------------------'
 	CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME  ' 
 	PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN ANY KEY TO MAIN MAINMENUE','$'
@@ -154,10 +180,12 @@
 		int 10h
 		
 	;--------------------------------------------------------------read data and draw----------------------------------------------------------------
+
+
 		CALL OpenFile
 		CALL ReadData
-		
 		LEA BX , BCGBALLData ; BL contains index at the current drawn pixel
+		
 		
 		MOV CX,0
 		MOV DX,0
