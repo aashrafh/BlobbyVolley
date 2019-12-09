@@ -58,7 +58,7 @@
 	player2WON      DB 'PLAYER 2 IS WINNWER','$'
 	Border          db '------------------------------------------------------------------------------------------------------'
 	CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME  ' 
-	PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN 2 TO MAIN MAINMENUE','$'
+	PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN ANY KEY TO MAIN MAINMENUE','$'
 	PLAY_AGIAN_SIZE EQU 41	 
 
 	;deal with file
@@ -198,7 +198,7 @@
 			
 			JMP DEFAULTG
 				
-		CHAT_MODE:         ;Change to Text MODE
+	CHAT_MODE:         ;Change to Text MODE
 
 		;text mode
 		MOV AH,0          
@@ -242,15 +242,15 @@
 		 
 		 ;print player names and chat
 		 print PLAYERNAME_1,NAME_SIZE,0,0,10
-		 print PLAYERNAME_2,NAME_SIZE,34,0,110
+		 print PLAYERNAME_2,NAME_SIZE,23,0,110
 		 
-		 PRINT PLAYERNAME_1,NAME_SIZE,0,21,01
-		 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21,01
+		 PRINT PLAYERNAME_1,NAME_SIZE,0,21,10
+		 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21,10
 		 
-		 PRINT PLAYERNAME_2,NAME_SIZE,0,22,01
-		 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22,01	
+		 PRINT PLAYERNAME_2,NAME_SIZE,0,22,110
+		 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22,110	
 		 PRINT BORDER,40,0,23,01
-		 PRINT CLOSE_GAME,24,0,24,01
+		 PRINT CLOSE_GAME,24,0,24,04
 
 	CHECK_TIME:
 		; add f4=>check to exit game(3Eh)
@@ -373,13 +373,14 @@
 
 	CMP AL,31H
 	je  DUMMY0        ;OUT OF RANGE
-	CMP AL,32H
-	je  DUMMY1          ;main menue
+	
+	jmp  DUMMY1          ;main menue
+
 
 	;return the control to the dos
-	control_dos:	
-		MOV AH, 4CH
-		INT 21H
+	; control_dos:	
+		; MOV AH, 4CH
+		; INT 21H
 		
 	MAIN ENDP
 
@@ -1003,7 +1004,7 @@ movePlayer1 ENDP
 	INTIALIZE_SCORE PROC NEAR
 
 	PLAYER1_SCORE_LABEL:
-		MOV DL,9H             ;COL
+		MOV DL,7H             ;COL
 		MOV DH,0              ;ROW
 		MOV BH,0              ;PAGE
 		MOV AH,02H
@@ -1040,7 +1041,7 @@ movePlayer1 ENDP
 
 	INCREASE_SCORE_PLAYER1 PROC NEAR
 
-		MOV DL,9H             ;COL
+		MOV DL,7H             ;COL
 		MOV DH,0              ;ROW
 		MOV BH,0              ;PAGE
 		MOV AH,02H
