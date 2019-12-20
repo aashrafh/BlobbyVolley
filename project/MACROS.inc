@@ -71,3 +71,19 @@ print MACRO  message,size, x, y ,color
     mov  dh,y                  ;Y (SCREEN COORDINATE). 
     int  10h  
 ENDM DRAW
+
+;scroll by one line
+Scroll_Chat macro Color,Upx,Upy,Downx,Downy;bytes
+pusha
+	;(
+		 mov ah,6       ; function 6
+		 mov al,1		;scroll one line
+		 mov bh,Color      ; video attribute
+		 mov ch,Upy      ; upper left Y
+		 mov cl,Upx       ; upper left X
+		 mov dh,Downy    ; lower right Y 
+		 mov dl,Downx      ; lower right X 
+		 int 10h  
+	;)
+popa	
+endm Scroll_Chat
