@@ -43,7 +43,7 @@
 	PLAYER2_SCORE db 0
 
 
-	MAX_SCORE EQU  4
+	MAX_SCORE EQU  100
 
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
@@ -56,7 +56,7 @@
 
 	WON_SIZE        EQU 10
  
-	
+	Bolean          db  0
 	player1WON       db 'PLAYER 1 IS WINNER','$' 
 	player2WON       db 'PLAYER 2 IS WINNER','$'
 	
@@ -174,9 +174,16 @@
 	DownCursory db 13
 	Up_Chat equ 1
 	Down_Chat equ 2
-
+	Up_Chat_Game   equ 3
+    Down_Chat_game equ  4 
 	UpColor equ 77
 	DownColor equ 07
+
+	UpCursorx_G db 8
+	UpCursory_G db 21
+	DownCursorx_G db 8
+	DownCursory_G db 22
+
 
 	.CODE
 	 ; __  __     _     ___   _  _ 
@@ -338,11 +345,12 @@
 	CHECK_TIME:
 		; add f4=>check to exit game(3Eh)
 		;Uncomment for F4 feature
+		mov Bolean,0 
 		mov ah,1
 		int 16h
-
+        
 		JNZ DUMMY2
-
+       
 		CHECK_TIME_CONTINUE:
 
 		MOV AH,2Ch ;get the system time
@@ -384,11 +392,15 @@
 		
 		JMP CHECK_TIME ;after everything checks time again
 		
-		;Uncomment for F4 feature
+		;Uncomment for F4/f5 feature
 		PRESSED_A_BUTTON:
-		CMP AH, 3Eh
+		CMP AH, 3Eh 
 		JE IS_F4
-
+		
+        cmp Ah,3Fh     ;F5
+		je CHAT_GAME
+		
+		
 		JMP CHECK_TIME_CONTINUE
 		
 		IS_F4:
@@ -402,6 +414,20 @@
 		mov PLAYER2_SCORE,0
 		
 		JMP LABELBACK
+		
+		CHAT_GAME:
+	
+    	Again_G:
+		mov Bolean,1
+		mov ah, 0
+		int 16h
+continue_chat:
+		call send
+		CMP SI,1
+		je CHECK_TIME 
+		call Receive
+		jmp continue_chat
+	     ;)
 
 		DUMMY0: ;for jump out of range problem
 		jmp VIDEO_MODE
@@ -1357,6 +1383,14 @@ Send proc
 		ret
 		Not_Esc_T:
 		
+
+
+        cmp ah,3Fh
+		jne NOT_F5
+		MOV SI,1
+		RET
+       NOT_F5:
+
 		;compare with enter
 		cmp ah, 1ch
 		jne dont_scroll_line
@@ -1408,9 +1442,17 @@ Send proc
 		ret
 		Dummy001:
 
+         cmp Bolean,1
+		 je Print2S
 		;display
 		mov bl,Up_Chat
 		call PrintChar
+		jmp RetrunSend
+
+	Print2S:
+	mov bl,Up_Chat_Game
+	call PrintCharGame	
+
 	;)
 RetrunSend:
 ret
@@ -1487,8 +1529,16 @@ Receive proc
 		ret
 		Dummy002:
 
+		cmp Bolean,1
+        je Print2R
+
 		 mov bl,Down_Chat
 		 call PrintChar
+         jmp  RetrunReceived
+
+	Print2R:
+	 mov bl,Down_Chat_game
+	 call PrintCharGame	 
 		
 	;)
 RetrunReceived:
@@ -1568,7 +1618,68 @@ PrintChar proc
 ret
 PrintChar endp
 
-	END MAIN 
+
+PrintCharGame PROC
+
+        cmp bl,Up_Chat_Game  ; prrint up
+        JNE DOWN_Cursor_Game		
+		
+		;mov dl,charsent
+		cmp UpCursorx_G,35 ;end of the line
+		je UpCursoryLine_G
+		
+		mov dl,UpCursorx_G
+		mov dh,UpCursory_G
+		inc UpCursorx_G
+		JMP Cursor_move_G
+		
+	UpCursoryLine_G:
+		Mov UpCursorx_G,8
+		Scroll_Chat 0,8,21,40,21
+		
+		jmp Cursor_move_G
+		
+	DOWN_Cursor_Game:
+		cmp DownCursorx_G,35;end of the line
+		je DownpCursoryLine_G
+		
+		mov dl,DownCursorx_G
+		mov dh,DownCursory_G 
+		inc DownCursorx_G
+		jmp Cursor_move_G
+	DownpCursoryLine_G:
+		mov  DownCursorx_G,8
+		Scroll_Chat 0,8,22,40,22
+		;mov UpCursory_G,22
+		;sub DownCursory,2
+	
+		
+		Cursor_move_G:
+		mov ah,2 
+		mov bh,0;page;;;;;;;;;;;;;;important
+		int 10h   ;excute 
+		
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+		;Print the character:
+	    cmp bl,Up_Chat_Game  ; print up
+        JNE DownPrint_G
+		mov dl,charsent
+		jmp PrintLabel_G	
+		
+	DownPrint_g:	
+		mov dl,CharReceived
+		
+	PrintLabel_G:	
+		mov ah, 2
+        int 21h 
+	;)
+ret
+
+
+
+PrintCharGame endp 
+
+END MAIN 
 		
 
 
