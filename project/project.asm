@@ -1,4 +1,6 @@
+	
 	INCLUDE MACROS.inc
+;	INCLUDE SyncMacros.inc
 
 	;wall object
 	EXTRN WALL:BYTE
@@ -7,6 +9,7 @@
 	;player 2 object
 	EXTRN PLAYER2:BYTE
 
+	; INCLUDE SyncMacros.inc
 	.MODEL SMALL
 	.STACK 64
 	.386
@@ -41,6 +44,7 @@
 	;score and chat data
 	PLAYER1_SCORE db 0
 	PLAYER2_SCORE db 0
+	PLAYER_SCORE db 0
 
 
 	MAX_SCORE EQU  7
@@ -129,7 +133,7 @@
 	PLAYER_ONE_Y DW 135		;Y position of the first player
 	OLD_X_Player1 DW WIN_LIMIT
 	OLD_Y_Player1 DW 135 
-	TEMP_MOVE_1   DW 00
+	TEMP_movE_1   DW 00
 
 	;player 2        
 	PLAYER_TWO_X DW  (269-WIN_LIMIT)			;X position of the second player
@@ -163,8 +167,8 @@
 	PLAYER_TWO_PLAYGROUND_X_END   EQU (WINDOW_WIDTH - BALL_SIZE)
 
 	;data for chat
-	CharSent db 's'
-	CharReceived db 'R'
+	CharSent db '$'
+	CharReceived db '$'
 	UpCursorx db 0
 	UpCursory db 0
 	DownCursorx db 0
@@ -182,41 +186,41 @@
 	 ;|_|  |_| /_/ \_\ |___| |_|\_|
 								  
 	;MAIN MENUE
-	MAIN PROC FAR
+MAIN PROC FAR
 
-		MOV AX, @DATA
-		MOV DS, AX	
-		Mov es,ax 
+		mov AX, @DATA
+		mov DS, AX	
+		mov es,ax 
 
 	LABELBACK:   
-		Mov ah , 00h  ;change to vedio mode
-		Mov Al , 13h
+		mov ah , 00h  ;change to vedio mode
+		mov Al , 13h
 		int 10h
 		
 	;--------------------------------------------------------------read data and draw----------------------------------------------------------------
 
 
 		CALL OpenFile
-		CALL ReadData
+		CALL Readdata
 		LEA BX , BCGBALLData ; BL contains index at the current drawn pixel
 		
 		
-		MOV CX,0
-		MOV DX,0
-		MOV AH,0ch
+		mov CX,0
+		mov DX,0
+		mov AH,0ch
 		
 	; Drawing loop
 	drawLoop:
-		MOV AL,[BX]
+		mov AL,[BX]
 		INT 10h 
 		INC CX
 		INC BX
-		CMP CX,BCGBALLWidth
+		cmp CX,BCGBALLWidth
 	JNE drawLoop 
 		
-		MOV CX , 0
+		mov CX , 0
 		INC DX
-		CMP DX , BCGBALLHeight
+		cmp DX , BCGBALLHeight
 	JNE drawLoop
 		call CloseFile
 
@@ -230,26 +234,42 @@
 	print COMMAND_ONE_C,CMD,2,3,04
 	print COMMAND_TWO,CMD,3,10,04
 	print COMMAND_TWO_C,CMD,2,12,04	
-		
-		
-	DEFAULTG:  
+			
+	CALL InitializUART
+	DEFAULTG:   
+			
 
-			MOV AH , 0      ;WAIT FOR KEY
-			INT 16h
-		
-			CMP AL, 31h     ;CHAT MODE PHASE 2
-			JE CHAT_MODE
+        lop1: 
+		    call Receive_Action
+			cmp CharReceived ,'$'
+			jne lop2 
 			
-			CMP AL, 32h
-			JE VIDEO_MODE   ;PLAY MODE 
-			
-			JMP DEFAULTG
+			call Send_Action
+			cmp CharReceived ,'$'
+			jne lop3 
+
+			jmp lop1 
+
+        lop2:
+		    call Send_Action
+			mov al , CharSent 
+			cmp al ,CharReceived
+			je start_game 
+			jmp lop2
+
+
+		lop3:
+		    call Receive_Action
+			mov al , CharReceived 
+			cmp al ,CharSent
+			je start_game 
+			jmp lop3	
 				
 	CHAT_MODE:         ;Change to Text MODE
 
 		;initialize
 		call InitializScreen
-		call InitializUART
+		; call InitializUART
 		
 		;(
 			mov si, 0
@@ -265,20 +285,23 @@
 		
 	VIDEO_MODE:
 		;text mode to take names
-		MOV AH,0          
-		MOV AL,03h
+		mov AH,0          
+		mov AL,03h
 		INT 10h
 
 		CALL TAKE_PLAYER_NAME
 		
-		Mov ah , 00h  ;change to vedio mode
-		Mov Al , 13h
+		mov ah , 00h  ;change to vedio mode
+		mov Al , 13h
 		int 10h
 		
 	start_game:
+     	mov ah , 00h  ;change to vedio mode
+		mov Al , 13h
+		int 10h
 		CALL INITIALIZE_SCREEN 
 		CALL INTIALIZE_SCORE
-		 
+	   
 		 ;print player names and chat
 		 print PLAYERNAME_1,NAME_SIZE,0,0,10
 		 print PLAYERNAME_2,NAME_SIZE,23,0,110
@@ -294,6 +317,9 @@
 	CHECK_TIME:
 		; add f4=>check to exit game(3Eh)
 		;Uncomment for F4 feature
+		
+	    ; call InitializUART
+
 		mov ah,1
 		int 16h
 
@@ -301,14 +327,14 @@
 
 		CHECK_TIME_CONTINUE:
 
-		MOV AH,2Ch ;get the system time
+		mov AH,2Ch ;get the system time
 		INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
 		
-		CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
+		cmp DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
 		JE CHECK_TIME    ;if it is the same, check again
 						 ;if it's different, then draw, move, etc.
 		
-		MOV TIME_AUX,DL ;update time
+		mov TIME_AUX,DL ;update time
 		
 		;DRAW the Wall
 		DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
@@ -324,28 +350,28 @@
 		DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT
 		;call DISPLAY_NAME 
 		
-		;Move BALL and Draw it
+		;move BALL and Draw it
 		CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
 		CALL MOVE_BALL
 		DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		 ; CALL DRAW_BALL / yellow
 		
-		; Move Players
+		; move Players
 		CALL movePlayer1  ;move for player1 
 		CALL movePlayer2  ;move for player2  
 		
-		CMP COUNTER_END1,0
+		cmp COUNTER_END1,0
 		JE PLAYERWON
-		CMP COUNTER_END2,0
+		cmp COUNTER_END2,0
 		JE PLAYERWON
 		
 		JMP CHECK_TIME ;after everything checks time again
 		
 		;Uncomment for F4 feature
 		PRESSED_A_BUTTON:
-		CMP AH, 3Eh
+		cmp AH, 3Eh
 		JE IS_F4
 
-		JMP CHECK_TIME_CONTINUE
+		jmp CHECK_TIME_CONTINUE
 		
 		IS_F4:
 		;consume the char
@@ -366,8 +392,8 @@
 		jmp LABELBACK
 
 	PLAYERWON:  
-		MOV AH,0          
-		MOV AL,03h
+		mov AH,0          
+		mov AL,03h
 		INT 10h 
 		
 		mov ah,2        ;move cursor 
@@ -376,17 +402,17 @@
 		int 10h 
 		
 
-		CMP COUNTER_END1,0
+		cmp COUNTER_END1,0
 		jne PLAYER1_DIDNT_WIN
 
-		MOV AH,9
+		mov AH,9
 		LEA DX,player1WON
 		INT 21H
 
 		JMP RESET_won
 		PLAYER1_DIDNT_WIN:
 		
-		MOV AH,9
+		mov AH,9
 		LEA DX,player2WON
 		INT 21h
 	
@@ -396,7 +422,7 @@
 		mov dh,10
 		int 10h 
 		
-		MOV AH,9
+		mov AH,9
 		LEA DX,PLAY_AGIAN 
 		INT 21H
 		
@@ -406,10 +432,10 @@
 	mov PLAYER1_SCORE,0
 	mov PLAYER2_SCORE,0
 	
-	MOV AH,0
+	mov AH,0
 	INT 16H
 
-	CMP AL,31H
+	cmp AL,31H
 	je  DUMMY0        ;OUT OF RANGE
 	
 	jmp  DUMMY1          ;main menue
@@ -417,10 +443,10 @@
 
 	;return the control to the dos
 	; control_dos:	
-		; MOV AH, 4CH
+		; mov AH, 4CH
 		; INT 21H
 		
-	MAIN ENDP
+MAIN ENDP
 
 	 ; ___   _  _   ___   _____ 
 	 ;|_ _| | \| | |_ _| |_   _|
@@ -430,22 +456,22 @@
 	 ;/ __|  / __| | _ \ | __| | __| | \| |
 	 ;\__ \ | (__  |   / | _|  | _|  | .` |
 	 ;|___/  \___| |_|_\ |___| |___| |_|\_|
-																	
-	INITIALIZE_SCREEN PROC
-	  
-		MOV AH, 06h    ; Scroll up function
-		XOR AL, AL     ; Clear entire screen
-		XOR CX, CX     ; Upper left corner CH=row, CL=column
-		MOV CL, 0
-		MOV CH, 1
-		MOV DX, 184FH  ; lower right corner DH=row, DL=column 
-		mov dl,4fh
-		mov dh,13h
-		
-		MOV BH, BGC     ; color 
-		INT 10H
-	  
-	INITIALIZE_SCREEN  ENDP
+																
+INITIALIZE_SCREEN PROC
+	
+	mov AH, 06h    ; Scroll up function
+	XOR AL, AL     ; Clear entire screen
+	XOR CX, CX     ; Upper left corner CH=row, CL=column
+	mov CL, 0
+	mov CH, 1
+	mov DX, 184FH  ; lower right corner DH=row, DL=column 
+	mov dl,4fh
+	mov dh,13h
+	
+	mov BH, BGC     ; color 
+	INT 10H
+	
+INITIALIZE_SCREEN  ENDP
 	 ; __  __    ___   __   __  ___ 
 	 ;|  \/  |  / _ \  \ \ / / | __|
 	 ;| |\/| | | (_) |  \ V /  | _| 
@@ -455,116 +481,116 @@
 	 ;| _ \  / _ \  | |__  | |__ 
 	 ;|___/ /_/ \_\ |____| |____|
 														   
-	MOVE_BALL PROC NEAR
+MOVE_BALL PROC NEAR
 		
-		MOV AX,BALL_VELOCITY_X    
-		ADD BALL_X,AX             ;move the ball horizontally
-		MOV AX,BALL_VELOCITY_Y
-		ADD BALL_Y,AX             ;move the ball vertically
+		mov AX,BALL_VELOCITY_X    
+		add BALL_X,AX             ;move the ball horizontally
+		mov AX,BALL_VELOCITY_Y
+		add BALL_Y,AX             ;move the ball vertically
 		
 		;check x
 		;check window
 		
-		MOV AX, 4
-		MOV BX, 0
-		MOV CX, 8
-		MOV DX, 160
+		mov AX, 4
+		mov BX, 0
+		mov CX, 8
+		mov DX, 160
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
+		cmp SI, 1                         
 		JE NEG_VELOCITY_X          
 		
-		MOV AX, 320
-		MOV BX, 316 ;320 - 4(ball size)
-		MOV CX, 8
-		MOV DX, 160
+		mov AX, 320
+		mov BX, 316 ;320 - 4(ball size)
+		mov CX, 8
+		mov DX, 160
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
+		cmp SI, 1                         
 		JE NEG_VELOCITY_X           
 		
 		;check wall x
-		MOV AX, (160 + 5 + 4)
-		MOV BX, (160 + 5)
-		MOV CX, (90 - 4)
-		MOV DX, 160
+		mov AX, (160 + 5 + 4)
+		mov BX, (160 + 5)
+		mov CX, (90 - 4)
+		mov DX, 160
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
+		cmp SI, 1                         
 		JE NEG_VELOCITY_X           
 		
-		MOV AX, (160 - 5)
-		MOV BX, (160 - 5 - 4)
-		MOV CX, (90 - 4)
-		MOV DX, 160
+		mov AX, (160 - 5)
+		mov BX, (160 - 5 - 4)
+		mov CX, (90 - 4)
+		mov DX, 160
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
+		cmp SI, 1                         
 		JE NEG_VELOCITY_X           
 		
 		;CHECK_PLAYER_ONE_X
-		MOV AX, PLAYER_ONE_X
-		MOV BX, PLAYER_ONE_Y
+		mov AX, PLAYER_ONE_X
+		mov BX, PLAYER_ONE_Y
 		CALL CHECK_COL					;Check collision in the x-axis
-		CMP AX, 1
+		cmp AX, 1
 		JE NEG_VELOCITY_X_PLAYER
 		
 		;CHECK_PLAYER_TWO_X
-		MOV AX, PLAYER_TWO_X
-		MOV BX, PLAYER_TWO_Y
+		mov AX, PLAYER_TWO_X
+		mov BX, PLAYER_TWO_Y
 		CALL CHECK_COL                ;Check collision in the x-axis
-		CMP AX, 1
+		cmp AX, 1
 		JE NEG_VELOCITY_X_PLAYER
 		
 		JMP CHECK_Y
 			
 		NEG_VELOCITY_X:
 			NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
-			MOV AX, BALL_VELOCITY_X
-			ADD AX, BALL_VELOCITY_X
-			ADD BALL_X, AX             ;move the ball vertically
+			mov AX, BALL_VELOCITY_X
+			add AX, BALL_VELOCITY_X
+			add BALL_X, AX             ;move the ball vertically
 		JMP CHECK_Y
 
 		NEG_VELOCITY_X_PLAYER:
 		NEG BALL_VELOCITY_X   ;BALL_VELOCITY_X = - BALL_VELOCITY_X
-		MOV AX,BALL_VELOCITY_X    
-		ADD AX, 1
-		ADD BALL_X,AX             ;move the ball horizontally
+		mov AX,BALL_VELOCITY_X    
+		add AX, 1
+		add BALL_X,AX             ;move the ball horizontally
 		
 		CHECK_Y:
 		
 		;check top of the play window
-		MOV AX, 320
-		MOV BX, 0
-		MOV CX, 8
-		MOV DX, (8 + 4)
+		mov AX, 320
+		mov BX, 0
+		mov CX, 8
+		mov DX, (8 + 4)
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
+		cmp SI, 1                         
 		JE NEG_VELOCITY_Y_1       
 		
 		;check wall y
-		MOV AX, (160 + 5 + 4)
-		MOV BX, (160 - 5 - 4)
-		MOV CX, (90 - 4)
-		MOV DX, 90
+		mov AX, (160 + 5 + 4)
+		mov BX, (160 - 5 - 4)
+		mov CX, (90 - 4)
+		mov DX, 90
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
+		cmp SI, 1                         
 		JE NEG_VELOCITY_Y_1        
 		
 		;check player one playground
-		MOV AX, (160 - 5 - 4)
-		MOV BX, 4
-		MOV CX, (160 - 4)
-		MOV DX, 160
+		mov AX, (160 - 5 - 4)
+		mov BX, 4
+		mov CX, (160 - 4)
+		mov DX, 160
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
-		;je MOVE_TO_PLAYGROUND_1	;feature
+		cmp SI, 1                         
+		;je movE_TO_PLAYGROUND_1	;feature
 		JE PLAYER_1_PLAYGROUND
 
 		;check player two playground
-		MOV AX, (320 - 4)
-		MOV BX, (160 + 5 + 4)
-		MOV CX, (160 - 4)
-		MOV DX, 160
+		mov AX, (320 - 4)
+		mov BX, (160 + 5 + 4)
+		mov CX, (160 - 4)
+		mov DX, 160
 		CALL CHECK_INSIDE_THIS_AREA 
-		CMP SI, 1                         
-		;je MOVE_TO_PLAYGROUND_2	;feature
+		cmp SI, 1                         
+		;je movE_TO_PLAYGROUND_2	;feature
 		JE PLAYER_2_PLAYGROUND 
 
 		JMP SKIP_1	;FOR JUMP OUT OF RANGE PROBLEM
@@ -573,80 +599,88 @@
 
 		SKIP_1:
 		;CHECK_PLAYER_ONE_Y
-		MOV AX, PLAYER_ONE_X
-		MOV BX, PLAYER_ONE_Y
+		mov AX, PLAYER_ONE_X
+		mov BX, PLAYER_ONE_Y
 		CALL CHECK_COL          ;Check collision in the top y-axis
-		CMP AX, 1
+		cmp AX, 1
 		JE NEG_VELOCITY_Y_PLAYER
 		
 		; ;CHECK_PLAYER_ONE_DOWN_Y
-		; MOV AX, PLAYER_ONE_X
-		; MOV BX, PLAYER_ONE_Y
+		; mov AX, PLAYER_ONE_X
+		; mov BX, PLAYER_ONE_Y
 		; CALL CHECK_PLAYER_DOWN_Y         ;Check collision in the bottom y-axis
-		; CMP AX, 1
+		; cmp AX, 1
 		; JE NEG_VELOCITY_Y_PLAYER
 		
 		;CHECK_PLAYER_TWO_Y
-		MOV AX, PLAYER_TWO_X
-		MOV BX, PLAYER_TWO_Y
+		mov AX, PLAYER_TWO_X
+		mov BX, PLAYER_TWO_Y
 		CALL CHECK_COL			 ;Check collision in the top y-axis
-		CMP AX, 1
+		cmp AX, 1
 		JE NEG_VELOCITY_Y_PLAYER
 		
 		; ;CHECK_PLAYER_TWO_DOWN_Y
-		; MOV AX, PLAYER_TWO_X		     
-		; MOV BX, PLAYER_TWO_Y
+		; mov AX, PLAYER_TWO_X		     
+		; mov BX, PLAYER_TWO_Y
 		; CALL CHECK_PLAYER_DOWN_Y	     ;Check collision in the bottom y-axis	
-		; CMP AX, 1
+		; cmp AX, 1
 		; JE NEG_VELOCITY_Y_PLAYER
 		
 		JMP RET_MOVE_BALL
 
 		PLAYER_1_PLAYGROUND:
 			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
-			MOV AX, BALL_VELOCITY_Y
-			ADD AX, BALL_VELOCITY_Y
-			ADD BALL_Y,AX             ;move the ball vertically
+			mov AX, BALL_VELOCITY_Y
+			add AX, BALL_VELOCITY_Y
+			add BALL_Y,AX             ;move the ball vertically
 			CALL INCREASE_SCORE_PLAYER2
+
+		    CALL REC_CHOICE_SYNC
+			MOV Al, CharReceived
+			MOV PLAYER2_SCORE, AL
 
 			JMP RET_MOVE_BALL
 
 		PLAYER_2_PLAYGROUND:
 			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
-			MOV AX, BALL_VELOCITY_Y
-			ADD AX, BALL_VELOCITY_Y
-			ADD BALL_Y,AX             ;move the ball vertically
+			mov AX, BALL_VELOCITY_Y
+			add AX, BALL_VELOCITY_Y
+			add BALL_Y,AX             ;move the ball vertically
 			CALL INCREASE_SCORE_PLAYER1
+			MOV AL, PLAYER1_SCORE
+			MOV CharSent, AL
+			CALL SEND_CHOICE_SYNC
 
 			JMP RET_MOVE_BALL
 
 		;this is a feature for the ball after it hit a player's playground
-		;MOVE_TO_PLAYGROUND_1:
-		;MOV BALL_X, 30
-		;MOV BALL_Y, 30
+		;movE_TO_PLAYGROUND_1:
+		;mov BALL_X, 30
+		;mov BALL_Y, 30
 		;JMP RET_MOVE_BALL
 		
-		;MOVE_TO_PLAYGROUND_2:
-		;MOV BALL_X, (WINDOW_WIDTH-30)
-		;MOV BALL_Y, 30
+		;movE_TO_PLAYGROUND_2:
+		;mov BALL_X, (WINDOW_WIDTH-30)
+		;mov BALL_Y, 30
 		;JMP RET_MOVE_BALL
 		
 		NEG_VELOCITY_Y:
 			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
-			MOV AX, BALL_VELOCITY_Y
-			ADD AX, BALL_VELOCITY_Y
-			ADD BALL_Y,AX             ;move the ball vertically
+			mov AX, BALL_VELOCITY_Y
+			add AX, BALL_VELOCITY_Y
+			add BALL_Y,AX             ;move the ball vertically
 		JMP RET_MOVE_BALL
 
 		NEG_VELOCITY_Y_PLAYER:
 			NEG BALL_VELOCITY_Y   ;BALL_VELOCITY_Y = - BALL_VELOCITY_Y
-			MOV AX, BALL_VELOCITY_Y
-			ADD AX, BALL_VELOCITY_Y
-			ADD BALL_Y,AX             ;move the ball vertically
+			mov AX, BALL_VELOCITY_Y
+			add AX, BALL_VELOCITY_Y
+			add BALL_Y,AX             ;move the ball vertically
 		
 		RET_MOVE_BALL:
+		mov AL , BALL_X 
 		RET
-	MOVE_BALL ENDP
+MOVE_BALL ENDP
 
 	 ; __  __    ___   __   __  ___ 
 	 ;|  \/  |  / _ \  \ \ / / | __|
@@ -658,28 +692,29 @@
 	 ;|_|   |____| /_/ \_\   |_|   |___| |_|_\  ___  |_|
 	 ;                                         |___|                                  
 ;------------------------------------------------------------	
-	movePlayer1 PROC near 
+movePlayer1 PROC near 
 	;READ CHARACTER FROM KEYBOARD
-	mov ah,1
-	int 16h
-	JZ DONE1
-	; mov ah,0
+	; mov ah,1
 	; int 16h
-
+	; JZ DONE1
+	; ; mov ah,0
+	; ; int 16h
+    call Send_Action
 	
 	mov bl ,al
-	;down
-	CMP AX, 1F73H
-	JZ DOWN
-	;Up
-	CMP AX, 1177H
-	JZ up
-	;Left
-	CMP AX, 1E61H
-	JZ left
-	;Right
-	CMP AX, 2064H
-	JZ Right
+	mov al ,CharSent
+
+		cmp al, 115
+		JZ DOWN
+		;Up
+		cmp al, 119
+		JZ Up
+		;Left
+		cmp al, 097
+		JZ Left
+		;Right
+		cmp al, 100
+		JZ Right
 	
 	JMP DEFAULT
 	
@@ -689,11 +724,11 @@
 		mov [D_X],ax
 		
 		
-		MOV AX ,PLAYER_WIDTH
-		ADD AX ,PLAYER_ONE_X
+		mov AX ,PLAYER_WIDTH
+		add AX ,PLAYER_ONE_X
 		
 		;check wall
-		CMP AX , (WALL_X-5)
+		cmp AX , (WALL_X-5)
 		JG DEFAULT
 	
 		DONE1:
@@ -705,8 +740,8 @@
 		mov [D_X],ax
 		
 		;check left screen
-		MOV AX ,PLAYER_ONE_X
-		CMP AX , 10
+		mov AX ,PLAYER_ONE_X
+		cmp AX , 10
 		JL DEFAULT
 		
 		jmp DONE
@@ -715,8 +750,8 @@
 		dec ax
 		mov [D_Y],ax
 		
-		MOV AX , PLAYER_ONE_Y
-		CMP AX , 20
+		mov AX , PLAYER_ONE_Y
+		cmp AX , 20
 		
 		JL DEFAULT
 		
@@ -726,9 +761,9 @@
 			inc ax
 			mov [D_Y],ax
 			
-			MOV AX ,PLAYER_ONE_Y
-			ADD AX ,PLAYER_HIGHT
-			CMP AX , 155 
+			mov AX ,PLAYER_ONE_Y
+			add AX ,PLAYER_HIGHT
+			cmp AX , 155 
 			
 			JA DEFAULT
 			
@@ -758,7 +793,7 @@
 			mov [PLAYER_ONE_Y] , SI
 			
 			inc cx
-            Cmp cx , PLAYER_OUTER_VELOCITY
+            cmp cx , PLAYER_OUTER_VELOCITY
 			je DONEALL
 			
 				
@@ -788,32 +823,46 @@ movePlayer1 ENDP
 	movePlayer2 PROC NEAR
 
 		;READ CHARACTER FROM KEYBOARD
-		mov ah,1
-		int 16h
-		JZ DONE_2
-		mov ah,0
-		int 16h
+		; mov ah,1
+		; int 16h
+		; JZ DONE_2
+		; mov ah,0
+		; int 16h
 		
-		mov SI , PLAYER_TWO_X
-		mov DI , PLAYER_TWO_Y
+		; mov SI , PLAYER_TWO_X
+		; mov DI , PLAYER_TWO_Y
 		
-		mov [OLD_X_Player2],SI
-		mov [OLD_Y_Player2],DI
-		
+		; mov [OLD_X_Player2],SI
+		; mov [OLD_Y_Player2],DI
+		call Receive_Action
 		;The only difference here is that we compare scan code not ascii code as previouszaq
 		;down
-		CMP AH, 80
+		; mov AX , CharReceived
+		; cmp Ax, 80
+		; JZ DOWN2
+		; ;Up
+		; cmp Ax, 72
+		; JZ Up2
+		; ;Left
+		; cmp AX, 4B00H
+		; JZ Left2
+		; ;Right
+		; cmp Ax, 77
+		; JZ Right2
+		mov al ,CharReceived
+
+		cmp al, 115
 		JZ DOWN2
 		;Up
-		CMP AH, 72
+		cmp al, 119
 		JZ Up2
 		;Left
-		CMP AX, 4B00H
+		cmp al, 097
 		JZ Left2
 		;Right
-		CMP AH, 77
+		cmp al, 100
 		JZ Right2
-		
+
 		JMP DEFAULT2
 		
 		Right2:
@@ -822,11 +871,11 @@ movePlayer1 ENDP
 			inc ax
 			mov [D_X_2],ax
 			
-			ADD AX ,PLAYER_TWO_X
-			ADD AX ,PLAYER_WIDTH
+			add AX ,PLAYER_TWO_X
+			add AX ,PLAYER_WIDTH
 			
 			;check wall
-			CMP AX ,315
+			cmp AX ,315
 			JG DEFAULT2
 			
 			DONE_2:
@@ -839,9 +888,9 @@ movePlayer1 ENDP
 			mov [D_X_2],ax
 			
 			;check left screen
-			MOV AX ,PLAYER_TWO_X
+			mov AX ,PLAYER_TWO_X
 	        
-			CMP AX , (WALL_X+WALL_WIDTH+10)
+			cmp AX , (WALL_X+WALL_WIDTH+10)
 			JL DEFAULT2
 			
 			jmp DONE2
@@ -851,8 +900,8 @@ movePlayer1 ENDP
 			dec ax
 			mov [D_Y_2],ax
 			
-			MOV AX , PLAYER_TWO_Y
-			CMP AX , 20
+			mov AX , PLAYER_TWO_Y
+			cmp AX , 20
 			
 		    JL DEFAULT2
 		
@@ -863,9 +912,9 @@ movePlayer1 ENDP
 			inc ax
 			mov [D_Y_2],ax
 			
-			MOV AX ,PLAYER_TWO_Y
-			ADD AX ,PLAYER_HIGHT
-			CMP AX , 155 
+			mov AX ,PLAYER_TWO_Y
+			add AX ,PLAYER_HIGHT
+			cmp AX , 155 
 			
 			JA DEFAULT2
 			
@@ -893,7 +942,7 @@ movePlayer1 ENDP
 			mov [PLAYER_TWO_Y] , SI
 			
 			inc cx
-            Cmp cx , PLAYER_OUTER_VELOCITY
+            cmp cx , PLAYER_OUTER_VELOCITY
 			je DONEALL2
 			
 				
@@ -921,212 +970,221 @@ movePlayer1 ENDP
 	;SI = 1 -> INSIDE
 	;SI = 0 -> OUTSIDE
 
-	CHECK_INSIDE_THIS_AREA PROC NEAR
+CHECK_INSIDE_THIS_AREA PROC NEAR
 
-	MOV SI, 0 ;INIT SI WITH 0
+	mov SI, 0 ;INIT SI WITH 0
 
-	CMP BALL_X, AX
+	cmp BALL_X, AX
 	JA RET_CHECK
 
-	CMP BALL_X, BX
+	cmp BALL_X, BX
 	JB RET_CHECK
 
-	CMP BALL_Y, CX
+	cmp BALL_Y, CX
 	JB RET_CHECK
 
-	CMP BALL_Y, DX
+	cmp BALL_Y, DX
 	JA RET_CHECK
 
-	MOV SI, 1 ;INSIDE!
+	mov SI, 1 ;INSIDE!
 	RET_CHECK:
 	RET
 
-	CHECK_INSIDE_THIS_AREA ENDP
+CHECK_INSIDE_THIS_AREA ENDP
 
-	;Collision with the wall in the x-axis
-	CHECK_WALL_X PROC NEAR
-		MOV AX, 0
-		CMP BALL_X, (WALL_X - BALL_SIZE)   ;check collision in the left side
-		JB RETURN
-		CMP BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE)   ;check collision in the right side
-		JA RETURN
-		CMP BALL_Y, WALL_Y                 ;check collision in the top side
-		JB RETURN
-		MOV AX, 1  ;there is a collision
-		RETURN:
-		RET 
-	CHECK_WALL_X ENDP
-	;--------------------------------------------------------------------------	
-	;Collision with the wall in the y-axis
-	CHECK_WALL_Y PROC NEAR
-		MOV AX, 0
-		CMP BALL_X, (WALL_X - BALL_SIZE)   ;check collision in the left side
-		JB RET_CHECK_WALL_Y
-		CMP BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE)    ;check collision in the right side
-		JA RET_CHECK_WALL_Y
-		CMP BALL_Y, WALL_Y                 ;check collision in the top side
-		JB RET_CHECK_WALL_Y
-		CMP BALL_Y, (WALL_Y + BALL_SIZE)   ;check collision in the top side
-		JA RET_CHECK_WALL_Y
-		MOV AX, 1  ;there is a collision
-		RET_CHECK_WALL_Y:
-		RET 
-	CHECK_WALL_Y ENDP
-	;----------------------------------------------------------------------------	
-	CHECK_PLAYER_ONE_PLAYGROUND PROC NEAR         ;Check if the second player attack the first player
-		MOV AX, 0
-		CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_START ;out of the playground
-		JB RET_CHECK_PLAYER_ONE_PLAYGROUND
-		CMP BALL_X, PLAYER_ONE_PLAYGROUND_X_END   ;out of the playground
-		JA RET_CHECK_PLAYER_ONE_PLAYGROUND
-		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE - 44)	  ;if it in the playground but strictly above the ground
-		JB RET_CHECK_PLAYER_ONE_PLAYGROUND        ;then no counted points
-		MOV AX, 1                                 ;there is an attack
-		RET_CHECK_PLAYER_ONE_PLAYGROUND:
-		RET 
-	CHECK_PLAYER_ONE_PLAYGROUND ENDP
-	;-----------------------------------------------------------------------------	
-	CHECK_PLAYER_TWO_PLAYGROUND PROC NEAR         ;Check if the first player attack the second player
-		MOV AX, 0
-		CMP BALL_X, PLAYER_TWO_PLAYGROUND_X_START ;out of the playground
-		JB RET_CHECK_PLAYER_TWO_PLAYGROUND
-		CMP BALL_X, PLAYER_TWO_PLAYGROUND_X_END   ;out of the playground
-		JA RET_CHECK_PLAYER_TWO_PLAYGROUND 
-		CMP BALL_Y, (WINDOW_HEIGHT - BALL_SIZE-44)	  ;if it in the playground but strictly above the ground
-		JB RET_CHECK_PLAYER_TWO_PLAYGROUND        ;then no counted points
-		MOV AX, 1                                 ;there is an attack
-		RET_CHECK_PLAYER_TWO_PLAYGROUND:
-		RET 
-	CHECK_PLAYER_TWO_PLAYGROUND ENDP
-	;-------------------------------------------------------------------------------	
-	CHECK_COL PROC NEAR
-		MOV PLAYER_X, AX 		;X of the specified player (first or second)
-		MOV PLAYER_Y, BX		;Y of the specified player (first or second)
-		MOV AX, 0				;flag
-		;four cases to achieve collision
-		;if any of them is false
-		;then no collision
-		
-		;first condition: BALL_X < PLAYER_X + PLAYER_WIDTH
-		MOV CX, PLAYER_X
-		ADD CX, PLAYER_WIDTH
-		CMP CX, BALL_X
-		JLE FALSE
-		
-		;second condition: BALL_X + BALL_SIZE > PLAYER_X
-		MOV CX, BALL_SIZE
-		ADD CX, BALL_X
-		CMP CX, PLAYER_X
-		JLE FALSE
-		
-		;third condition: BALL_Y < PLAYER_Y + PLAYER_HIGHT
-		MOV CX, PLAYER_Y
-		ADD CX, PLAYER_HIGHT
-		CMP CX, BALL_Y
-		JLE FALSE
-		
-		;fourth condition: BALL_Y + BALL_SIZE > PLAYER_Y
-		MOV CX, BALL_Y
-		ADD CX, BALL_SIZE
-		CMP CX, PLAYER_Y
-		JLE FALSE
-		
-		;TRUE
-		MOV AX, 1
-		
-		FALSE:
-			RET
-	CHECK_COL ENDP
-	;intialize score
-
-	INTIALIZE_SCORE PROC NEAR
-
-	PLAYER1_SCORE_LABEL:
-		MOV DL,7H             ;COL
-		MOV DH,0              ;ROW
-		MOV BH,0              ;PAGE
-		MOV AH,02H
-		INT 10H               ;EXECUTE MOVE CURSOR
-			
-		MOV BL,7              ;COLOR
-		MOV AL,PLAYER1_SCORE  ;OFFSET
-			
-		ADD AL,'0'
-		
-		INC PLAYER1_SCORE
-		
-		MOV AH,0EH            ;EXECUTE PRINTING
-		INT 10H
-		mov ax,1
-	PLAYER2_SCORE_LABEL:
-		MOV DL,30             ;COL
-		MOV DH,0              ;ROW
-		MOV BH,0              ;PAGE
-		MOV AH,02H
-		INT 10H               ;EXECUTE MOVE CURSOR
-			
-		MOV BL,7              ;COLOR
-		MOV AL,PLAYER2_SCORE  ;OFFSET 
-		
-		ADD AL,'0'
-		INC PLAYER2_SCORE
-		MOV AH,0EH            ;EXECUTE PRINTING
-		INT 10H
-		mov ax,1
-
-	RET
-	INTIALIZE_SCORE ENDP
-
-	INCREASE_SCORE_PLAYER1 PROC NEAR
-
-		MOV DL,7H             ;COL
-		MOV DH,0              ;ROW
-		MOV BH,0              ;PAGE
-		MOV AH,02H
-		INT 10H               ;EXECUTE MOVE CURSOR
-			
-		MOV BL,7              ;COLOR
-		MOV AL,PLAYER1_SCORE  ;OFFSET 
-		INC PLAYER1_SCORE     ;INCREMENT CURSOR
-		ADD AL,'0'
-		
-		MOV AH,0EH            ;EXECUTE PRINTING
-		INT 10H
-		mov ax,1
-		DEC COUNTER_END1
-		;CALL CHECK_MAX_SCORE_1
-
-	RET
-	INCREASE_SCORE_PLAYER1 ENDP
-	 
-	INCREASE_SCORE_PLAYER2 PROC NEAR
-		
-		MOV DL,30             ;COL
-		MOV DH,0              ;ROW
-		MOV BH,0              ;PAGE
-		MOV AH,02H
-		INT 10H               ;EXECUTE MOVE CURSOR
-			
-		MOV BL,7              ;COLOR
-		MOV AL,PLAYER2_SCORE  ;OFFSET 
-		INC PLAYER2_SCORE     ;INCREMENT CURSOR
-		ADD AL,'0'
-		
-		MOV AH,0EH            ;EXECUTE PRINTING
-		INT 10H
-		mov ax,1
-		DEC COUNTER_END2
-		
-		;CALL CHECK_MAX_SCORE_2
+;Collision with the wall in the x-axis
+CHECK_WALL_X PROC NEAR
+	mov AX, 0
+	cmp BALL_X, (WALL_X - BALL_SIZE)   ;check collision in the left side
+	JB RETURN
+	cmp BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE)   ;check collision in the right side
+	JA RETURN
+	cmp BALL_Y, WALL_Y                 ;check collision in the top side
+	JB RETURN
+	mov AX, 1  ;there is a collision
+	RETURN:
+	RET 
+CHECK_WALL_X ENDP
+;--------------------------------------------------------------------------	
+;Collision with the wall in the y-axis
+CHECK_WALL_Y PROC NEAR
+	mov AX, 0
+	cmp BALL_X, (WALL_X - BALL_SIZE)   ;check collision in the left side
+	JB RET_CHECK_WALL_Y
+	cmp BALL_X, (WALL_X + WALL_WIDTH + BALL_SIZE)    ;check collision in the right side
+	JA RET_CHECK_WALL_Y
+	cmp BALL_Y, WALL_Y                 ;check collision in the top side
+	JB RET_CHECK_WALL_Y
+	cmp BALL_Y, (WALL_Y + BALL_SIZE)   ;check collision in the top side
+	JA RET_CHECK_WALL_Y
+	mov AX, 1  ;there is a collision
+	RET_CHECK_WALL_Y:
+	RET 
+CHECK_WALL_Y ENDP
+;----------------------------------------------------------------------------	
+CHECK_PLAYER_ONE_PLAYGROUND PROC NEAR         ;Check if the second player attack the first player
+	mov AX, 0
+	cmp BALL_X, PLAYER_ONE_PLAYGROUND_X_START ;out of the playground
+	JB RET_CHECK_PLAYER_ONE_PLAYGROUND
+	cmp BALL_X, PLAYER_ONE_PLAYGROUND_X_END   ;out of the playground
+	JA RET_CHECK_PLAYER_ONE_PLAYGROUND
+	cmp BALL_Y, (WINDOW_HEIGHT - BALL_SIZE - 44)	  ;if it in the playground but strictly above the ground
+	JB RET_CHECK_PLAYER_ONE_PLAYGROUND        ;then no counted points
+	mov AX, 1                                 ;there is an attack
+	RET_CHECK_PLAYER_ONE_PLAYGROUND:
+	RET 
+CHECK_PLAYER_ONE_PLAYGROUND ENDP
+;-----------------------------------------------------------------------------	
+CHECK_PLAYER_TWO_PLAYGROUND PROC NEAR         ;Check if the first player attack the second player
+	mov AX, 0
+	cmp BALL_X, PLAYER_TWO_PLAYGROUND_X_START ;out of the playground
+	JB RET_CHECK_PLAYER_TWO_PLAYGROUND
+	cmp BALL_X, PLAYER_TWO_PLAYGROUND_X_END   ;out of the playground
+	JA RET_CHECK_PLAYER_TWO_PLAYGROUND 
+	cmp BALL_Y, (WINDOW_HEIGHT - BALL_SIZE-44)	  ;if it in the playground but strictly above the ground
+	JB RET_CHECK_PLAYER_TWO_PLAYGROUND        ;then no counted points
+	mov AX, 1                                 ;there is an attack
+	RET_CHECK_PLAYER_TWO_PLAYGROUND:
+	RET 
+CHECK_PLAYER_TWO_PLAYGROUND ENDP
+;-------------------------------------------------------------------------------	
+CHECK_COL PROC NEAR
+	mov PLAYER_X, AX 		;X of the specified player (first or second)
+	mov PLAYER_Y, BX		;Y of the specified player (first or second)
+	mov AX, 0				;flag
+	;four cases to achieve collision
+	;if any of them is false
+	;then no collision
+	
+	;first condition: BALL_X < PLAYER_X + PLAYER_WIDTH
+	mov CX, PLAYER_X
+	add CX, PLAYER_WIDTH
+	cmp CX, BALL_X
+	JLE FALSE
+	
+	;second condition: BALL_X + BALL_SIZE > PLAYER_X
+	mov CX, BALL_SIZE
+	add CX, BALL_X
+	cmp CX, PLAYER_X
+	JLE FALSE
+	
+	;third condition: BALL_Y < PLAYER_Y + PLAYER_HIGHT
+	mov CX, PLAYER_Y
+	add CX, PLAYER_HIGHT
+	cmp CX, BALL_Y
+	JLE FALSE
+	
+	;fourth condition: BALL_Y + BALL_SIZE > PLAYER_Y
+	mov CX, BALL_Y
+	add CX, BALL_SIZE
+	cmp CX, PLAYER_Y
+	JLE FALSE
+	
+	;TRUE
+	mov AX, 1
+	
+	FALSE:
 		RET
-	INCREASE_SCORE_PLAYER2 ENDP
+CHECK_COL ENDP
+;intialize score
 
-	OpenFile PROC 
+INTIALIZE_SCORE PROC NEAR
+
+PLAYER1_SCORE_LABEL:
+	mov DL,7H             ;COL
+	mov DH,0              ;ROW
+	mov BH,0              ;PAGE
+	mov AH,02H
+	INT 10H               ;EXECUTE movE CURSOR
+		
+	mov BL,7              ;COLOR
+	mov AL,PLAYER1_SCORE  ;OFFSET
+		
+	add AL,'0'
+	
+	INC PLAYER1_SCORE
+	
+	mov AH,0EH            ;EXECUTE PRINTING
+	INT 10H
+	mov ax,1
+PLAYER2_SCORE_LABEL:
+	mov DL,30             ;COL
+	mov DH,0              ;ROW
+	mov BH,0              ;PAGE
+	mov AH,02H
+	INT 10H               ;EXECUTE movE CURSOR
+		
+	mov BL,7              ;COLOR
+	mov AL,PLAYER2_SCORE  ;OFFSET 
+	
+	add AL,'0'
+	INC PLAYER2_SCORE
+	mov AH,0EH            ;EXECUTE PRINTING
+	INT 10H
+	mov ax,1
+
+RET
+INTIALIZE_SCORE ENDP
+
+INCREASE_SCORE_PLAYER1 PROC NEAR
+
+	mov DL,7H             ;COL
+	mov DH,0              ;ROW
+	mov BH,0              ;PAGE
+	mov AH,02H
+	INT 10H               ;EXECUTE movE CURSOR
+		
+	mov BL,7              ;COLOR
+	mov AL,PLAYER1_SCORE  ;OFFSET 
+	INC PLAYER1_SCORE     ;INCREMENT CURSOR
+	; MOV AL, PLAYER1_SCORE
+	
+	; MOV CharSent, AL
+
+	; CALL SEND_CHOICE_SYNC
+	
+	add AL,'0'
+	
+	mov AH,0EH            ;EXECUTE PRINTING
+	INT 10H
+	mov ax,1
+	DEC COUNTER_END1
+	;CALL CHECK_MAX_SCORE_1
+
+RET
+INCREASE_SCORE_PLAYER1 ENDP
+	
+INCREASE_SCORE_PLAYER2 PROC NEAR
+	
+	mov DL,30             ;COL
+	mov DH,0              ;ROW
+	mov BH,0              ;PAGE
+	mov AH,02H
+	INT 10H               ;EXECUTE movE CURSOR
+		
+	mov BL,7              ;COLOR
+	mov AL,PLAYER2_SCORE  ;OFFSET 
+	INC PLAYER2_SCORE     ;INCREMENT CURSOR
+	; CALL REC_CHOICE_SYNC
+	; MOV AL, CharReceived
+	; MOV PLAYER2_SCORE, AL
+	add AL,'0'
+	
+	mov AH,0EH            ;EXECUTE PRINTING
+	INT 10H
+	mov ax,1
+	DEC COUNTER_END2
+	
+	;CALL CHECK_MAX_SCORE_2
+	RET
+INCREASE_SCORE_PLAYER2 ENDP
+
+OpenFile PROC 
 
 		; Open file
 
-		MOV AH, 3Dh
-		MOV AL, 0 ; read only
+		mov AH, 3Dh
+		mov AL, 0 ; read only
 		LEA DX, BCGBALLFilename
 		INT 21h
 		
@@ -1134,52 +1192,52 @@ movePlayer1 ENDP
 		; carry = 0 -> successful , file handle -> AX
 		; carry = 1 -> failed , AX -> error code
 		 
-		MOV [BCGBALLFilehandle], AX
+		mov [BCGBALLFilehandle], AX
 		RET
 
-	OpenFile ENDP
+OpenFile ENDP
 
-	ReadData PROC
+Readdata PROC
 
-		MOV AH,3Fh
-		MOV BX, [BCGBALLFilehandle]
-		MOV CX,BCGBALLWidth*BCGBALLHeight ; number of bytes to read
+		mov AH,3Fh
+		mov BX, [BCGBALLFilehandle]
+		mov CX,BCGBALLWidth*BCGBALLHeight ; number of bytes to read
 		LEA DX, BCGBALLData
 		INT 21h
 		RET
 
-	ReadData ENDP 
+Readdata ENDP 
 
-	CloseFile PROC
+CloseFile PROC
 
-		MOV AH, 3Eh
-		MOV BX, [BCGBALLFilehandle]
+		mov AH, 3Eh
+		mov BX, [BCGBALLFilehandle]
 
 		INT 21h
 		RET
 
-	CloseFile ENDP
+CloseFile ENDP
 
-	TAKE_PLAYER_NAME PROC 
+TAKE_PLAYER_NAME PROC 
 		;move cursor
-		MOV AH,2
-		MOV DL,30
-		MOV DH,5
+		mov AH,2
+		mov DL,30
+		mov DH,5
 		INT 10h
 
-			MOV AH,9
+			mov AH,9
 			LEA DX,Enter_max_letters
 			INT 21H
 
 	PLAYER1_MESSAGE:
 
 		;move cursor
-		MOV AH,2
-		MOV DL,0
-		MOV DH,10
+		mov AH,2
+		mov DL,0
+		mov DH,10
 		INT 10h
 				
-		MOV AH,9
+		mov AH,9
 		LEA DX,PLAYERNAME_1_MESSAGE
 		INT 21H
 		
@@ -1188,9 +1246,9 @@ movePlayer1 ENDP
 		LEA dx, PLAYERNAME_1                   
 		int 21h 
 		
-		mov ah,2          ;Move Cursor
-		MOV DL,0
-		MOV DH,11
+		mov ah,2          ;move Cursor
+		mov DL,0
+		mov DH,11
 		int 10h    
 
 		;Display the input data in a new location
@@ -1198,14 +1256,14 @@ movePlayer1 ENDP
 		mov ah, 9
 		int 21h
 		
-		mov ah,2          ;Move Cursor
-		MOV DL,0
-		MOV DH,14
+		mov ah,2          ;move Cursor
+		mov DL,0
+		mov DH,14
 		int 10h    
 
 	PLAYER2_MESSAGE:
 
-		MOV AH,9
+		mov AH,9
 		LEA DX,PLAYERNAME_2_MESSAGE
 		INT 21H
 
@@ -1213,29 +1271,29 @@ movePlayer1 ENDP
 		mov dx,offset PLAYERNAME_2                   
 		int 21h 
 		
-		mov ah,2          ;Move Cursor
-		MOV DL,0
-		MOV DH,15
+		mov ah,2          ;move Cursor
+		mov DL,0
+		mov DH,15
 		int 10h  	
 		
 		mov dx, offset PLAYERNAME_2 +1;Display the input data in a new location
 		mov ah, 9
 		int 21h
 		
-		mov ah,2          ;Move Cursor
-		MOV DL,0
-		MOV DH,17
+		mov ah,2          ;move Cursor
+		mov DL,0
+		mov DH,17
 		int 10h  	
 			
 		mov dx, offset PRESS1_TO_START
 		mov ah, 9
 		int 21h 
 			
-		MOV AH , 0
+		mov AH , 0
 		INT 16h
 		
 	RET
-	TAKE_PLAYER_NAME ENDP
+TAKE_PLAYER_NAME ENDP
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;chat
 InitializScreen proc
@@ -1473,7 +1531,7 @@ PrintChar proc
 		Scroll_Chat UpColor,0,0,79,12
 		dec UpCursory
 	DonotScrollUp:	
-		MOV UpCursorx,0 ;start from the first column	
+		mov UpCursorx,0 ;start from the first column	
 		mov dl,UpCursorx
 		mov dh,UpCursory
 		;for the upcomming character;could be removed from here and line 187 and be placed
@@ -1497,7 +1555,7 @@ PrintChar proc
 		Scroll_Chat DownColor,0,13,79,24
 		sub DownCursory,2
 	DonotScrollDown:
-		MOV DownCursorx,0	
+		mov DownCursorx,0	
 	    mov dl,DownCursorx
 		mov dh,DownCursory
 		inc DownCursorx;for the upcomming character
@@ -1523,7 +1581,111 @@ PrintChar proc
 	;)
 ret
 PrintChar endp
+;------------------------------------------------------
+Receive_Action Proc
 
+        ;Check that Data is Ready
+		mov dx , 3FDH  ; Line Status Register
+		in al , dx  
+		test al , 1
+		jz RetrunReceived_1           ;Not Ready 
+		
+		 ;If Ready read the VALUE in Receive data register
+		 mov dx , 03F8H     
+		 in al , dx      
+		 mov CharReceived , al 
+		
+        RetrunReceived_1:
+        ret 
+
+Receive_Action Endp
+;------------------------------------------------------------
+Send_Action Proc
+
+ check_buffer_1:
+		mov ah,1
+		int 16h
+		jz RetrunSend_1
+		;if found letter, eat buffer
+		mov ah,0
+		int 16h
+		mov CharSent,al
+		
+	CheckAgain_1:	
+		;Check that Transmitter Holding Register is Empty
+		mov dx , 3FDH  ; Line Status Register
+		In al , dx    ;Read Line Status
+		test al , 00100000b
+		jz  CheckAgain_1        ;Not empty 
+		;jz RetrunSend
+		
+		;If empty put the VALUE in Transmit data register
+		mov dx , 3F8H  ; Transmit data register
+		mov  al,CharSent
+		out dx , al
+
+      RetrunSend_1:
+	  ret
+Send_Action Endp
+
+SEND_CHOICE_SYNC Proc
+
+	MOV DX, 3FDH
+	AGAIN_SUNC:
+		IN AL, DX
+		AND AL, 00100000b
+		JZ AGAIN_SUNC
+
+	MOV DX, 3F8H
+	MOV AL, CharSent
+	OUT DX, AL
+	ret
+SEND_CHOICE_SYNC Endp
+
+; SEND_CHOICE_SYNC MACRO VALUE
+;     LOCAL AGAIN
+;     MOV DX, 3FDH
+;     AGAIN:
+;         IN AL, DX
+;         AND AL, 00100000b
+;         JZ AGAIN
+
+;     MOV DX, 3F8H
+;     MOV AL, VALUE
+;     OUT DX, AL
+; ENDM SEND_CHOICE_SYNC
+
+
+REC_CHOICE_SYNC Proc
+
+	MOV DX, 3FDH
+    IN AL, DX
+    AND AL, 1
+    JNZ READ
+    JMP FINISH
+
+    READ: 
+        MOV DX, 03F8H
+        IN AL, DX
+        MOV CharReceived, AL
+    FINISH:
+	ret
+REC_CHOICE_SYNC Endp
+
+; REC_CHOICE_SYNC MACRO VALUE
+;     MOV DX, 3FDH
+;     IN AL, DX
+;     AND AL, 1
+;     JNZ READ
+;     JMP FINISH
+
+;     READ: 
+;         MOV DX, 03F8H
+;         IN AL, DX
+;         MOV VALUE, AL
+;     FINISH:
+        
+; ENDM REC_CHOICE_SYNC
 	END MAIN 
 		
 
