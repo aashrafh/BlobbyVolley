@@ -333,4 +333,46 @@ PrintChar proc
 ret
 PrintChar endp
 
+Receive_Action Proc
+
+        ;Check that Data is Ready
+		mov dx , 3FDH  ; Line Status Register
+		in al , dx  
+		test al , 1
+		JZ RetrunReceived            ;Not Ready 
+		
+		 ;If Ready read the VALUE in Receive data register
+		 mov dx , 03F8H     
+		 in al , dx      
+		 mov CharReceived , al 
+		
+        RetrunReceived
+Receive_Action Endp
+
+Send_Ation Proc
+
+ check_buffer:
+		mov ah,1
+		int 16h
+		jz RetrunSend
+		;if found letter, eat buffer
+		mov ah,0
+		int 16h
+		mov CharSent,al
+		
+	CheckAgain:	
+		;Check that Transmitter Holding Register is Empty
+		mov dx , 3FDH  ; Line Status Register
+		In al , dx    ;Read Line Status
+		test al , 00100000b
+		JZ  CheckAgain        ;Not empty 
+		;jz RetrunSend
+		
+		;If empty put the VALUE in Transmit data register
+		mov dx , 3F8H  ; Transmit data register
+		mov  al,CharSent
+		out dx , al 
+Send_Ation Endp
+
+
 end main
