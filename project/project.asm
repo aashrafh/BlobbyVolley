@@ -47,7 +47,7 @@
 	PLAYER_SCORE db 0
 
 
-	MAX_SCORE EQU  7
+	MAX_SCORE EQU  4
 
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
@@ -91,6 +91,9 @@
 	CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME  ' 
 	PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN ANY KEY TO MAIN MAINMENUE','$'
 	PLAY_AGIAN_SIZE EQU 41	 
+
+    CHOOSE_LEVEL   DB 'CHOOSE LEVEL GAME PRESS 1 TO LEVEL 1  PRESS 2 TO LEVEL 2','$'
+	
 
 	;deal with file
 	BCGBALLWidth         EQU 320
@@ -282,13 +285,57 @@ MAIN PROC FAR
 			je LBLBACK_dummy0
 			jmp Again
 		;)	
+	
+		
+		
+		
 		
 	VIDEO_MODE:
 		;text mode to take names
 		mov AH,0          
 		mov AL,03h
+	
+	LEVEL_GAME:	
+		MOV AH,0          
+		MOV AL,03h
 		INT 10h
+		MOV AH,9
+		LEA DX,CHOOSE_LEVEL
+        INT 21H		
 
+		MOV AH,0
+		INT 16H
+		
+		CMP AL,31H
+		JE LEVEL1
+		CMP AL,32H
+		JE LEVEL2
+		
+		JMP LEVEL_GAME
+		
+		LEVEL1:
+		MOV BALL_VELOCITY_X,2
+		MOV BALL_VELOCITY_Y,2
+		
+		MOV PLAYER_VELOCITY_X,6
+		MOV PLAYER_VELOCITY_Y,6
+		
+		
+		JMP TAKE_NAMES
+		LEVEL2:
+		MOV BALL_VELOCITY_X,4
+		MOV BALL_VELOCITY_Y,4
+		
+		MOV PLAYER_VELOCITY_X,1
+		MOV PLAYER_VELOCITY_Y,1
+		
+		
+		;text mode to take names
+	TAKE_NAMES:
+	     MOV AH,0          
+		MOV AL,03h
+		INT 10h
+      
 		CALL TAKE_PLAYER_NAME
 		
 		mov ah , 00h  ;change to vedio mode
