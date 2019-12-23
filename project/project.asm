@@ -47,7 +47,7 @@
 	PLAYER_SCORE db 0
 
 
-	MAX_SCORE EQU  4
+	MAX_SCORE EQU  8
 
 	COUNTER_END1 DB   MAX_SCORE            ;use for check who get max score
 	COUNTER_END2 DB   MAX_SCORE            ;use for check who get max score
@@ -196,6 +196,10 @@ MAIN PROC FAR
 		mov es,ax 
 
 	LABELBACK:   
+	    mov al ,'$'
+		mov CharReceived , al
+		mov CharSent , al
+
 		mov ah , 00h  ;change to vedio mode
 		mov Al , 13h
 		int 10h
@@ -238,9 +242,9 @@ MAIN PROC FAR
 	print COMMAND_TWO,CMD,3,10,04
 	print COMMAND_TWO_C,CMD,2,12,04	
 			
-	CALL InitializUART
+	CALL InitializUART	
 	DEFAULTG:   
-			
+	
 
         lop1: 
 		    call Receive_Action
@@ -257,7 +261,7 @@ MAIN PROC FAR
 		    call Send_Action
 			mov al , CharSent 
 			cmp al ,CharReceived
-			je start_game 
+			je check_choice 
 			jmp lop2
 
 
@@ -265,9 +269,19 @@ MAIN PROC FAR
 		    call Receive_Action
 			mov al , CharReceived 
 			cmp al ,CharSent
-			je start_game 
+			je check_choice
 			jmp lop3	
-				
+
+    
+	check_choice:
+	        cmp  al ,31h
+            je CHAT_MODE
+
+			cmp al ,32h 
+			je start_game
+
+			jmp lop1 	
+						
 	CHAT_MODE:         ;Change to Text MODE
 
 		;initialize
@@ -332,7 +346,7 @@ MAIN PROC FAR
 		
 		;text mode to take names
 	TAKE_NAMES:
-	     MOV AH,0          
+	    MOV AH,0          
 		MOV AL,03h
 		INT 10h
       
@@ -433,7 +447,7 @@ MAIN PROC FAR
 		JMP LABELBACK
 
 		DUMMY0: ;for jump out of range problem
-		jmp VIDEO_MODE
+		jmp LABELBACK
 
 		DUMMY1:
 		jmp LABELBACK
