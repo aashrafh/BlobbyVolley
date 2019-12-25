@@ -88,11 +88,13 @@
 	
 	
 	Border          db '------------------------------------------------------------------------------------------------------'
-	CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME  ' 
+	CLOSE_GAME      DB 'ENTER F4 TO CLOSE GAME/F5 CHAT' 
 	PLAY_AGIAN      DB 'PRESS 1 TO PLAY AGAIN ANY KEY TO MAIN MAINMENUE','$'
 	PLAY_AGIAN_SIZE EQU 41	 
 
     CHOOSE_LEVEL   DB 'CHOOSE LEVEL GAME PRESS 1 TO LEVEL 1  PRESS 2 TO LEVEL 2','$'
+
+	CONFIRMATION   DB 'PRESS 2 TO START GAME','$'
 	
 
 	;deal with file
@@ -108,9 +110,9 @@
 	COMMAND_ONE_C DB '  CHAT MODE','$'
 	COMMAND_TWO   DB 'PRESS 2 TO ','$'
 	COMMAND_TWO_C DB '  PLAY MODE','$'
-	PHASE_2       DB 'CHAT WILL BE IN PHASE 2 PRESS ANY KEY TO START','$'
+	PHASE_2       DB 'HELLO','$'
 	Enter_max_letters db 'Enter 5 letters  only','$'
-	PRESS1_TO_START DB 'PRESS ANY KEY TO START','$'
+	PRESS1_TO_START DB 'PRESS  2 TO START','$'
 	;number of COMMAND 1 and 2 string chars
 	CMD EQU 11
 	Counter_string db CMD
@@ -179,6 +181,15 @@
 	Up_Chat equ 1
 	Down_Chat equ 2
 
+    Bolean db 0
+	Up_Chat_Game   equ 3
+    Down_Chat_game equ  4 
+	UpCursorx_G db 8
+	UpCursory_G db 21
+	DownCursorx_G db 8
+	DownCursory_G db 22
+
+
 	UpColor equ 77
 	DownColor equ 07
 
@@ -198,12 +209,11 @@ MAIN PROC FAR
 	LABELBACK:   
 	    mov al ,'$'
 		mov CharReceived , al
-		mov CharSent , al
-
+		mov CharSent ,al
 		mov ah , 00h  ;change to vedio mode
 		mov Al , 13h
 		int 10h
-		
+		 
 	;--------------------------------------------------------------read data and draw----------------------------------------------------------------
 
 
@@ -278,7 +288,7 @@ MAIN PROC FAR
             je CHAT_MODE
 
 			cmp al ,32h 
-			je start_game
+			je VIDEO_MODE
 
 			jmp lop1 	
 						
@@ -286,7 +296,7 @@ MAIN PROC FAR
 
 		;initialize
 		call InitializScreen
-		; call InitializUART
+		;call InitializUART
 		
 		;(
 			mov si, 0
@@ -300,6 +310,7 @@ MAIN PROC FAR
 			jmp Again
 		;)	
 	
+	
 		
 		
 		
@@ -308,8 +319,8 @@ MAIN PROC FAR
 		;text mode to take names
 		mov AH,0          
 		mov AL,03h
-	
-	LEVEL_GAME:	
+	    ;int 13h
+LEVEL_GAME:	
 		MOV AH,0          
 		MOV AL,03h
 		INT 10h
@@ -344,58 +355,104 @@ MAIN PROC FAR
 		MOV PLAYER_VELOCITY_Y,1
 		
 		
+
+
 		;text mode to take names
 	TAKE_NAMES:
-	    MOV AH,0          
-		MOV AL,03h
-		INT 10h
+	MOV AH,0          
+	MOV AL,03h
+    INT 10h
       
-		CALL TAKE_PLAYER_NAME
+	; 	CALL TAKE_PLAYER_NAME
 		
-		mov ah , 00h  ;change to vedio mode
-		mov Al , 13h
-		int 10h
+	 MOV AH,9
+	 LEA DX,CONFIRMATION
+	 INT 21H	
+    
+    go_again:
+        mov al ,'$'
+		mov CharSent ,al 
+		mov  CharReceived ,al 
+        
+		
+		
+		lop1_1: 
+		    call Receive_Action
+			cmp CharReceived ,'$'
+			jne lop2_2 
+			
+			call Send_Action
+			cmp CharReceived ,'$'
+			jne lop3_3 
+
+			jmp lop1_1 
+
+        lop2_2:
+		    call Send_Action
+			mov al , CharSent 
+			cmp al ,CharReceived
+			je check_choice_1 
+			jmp lop2_2
+
+
+		lop3_3:
+		    call Receive_Action
+			mov al , CharReceived 
+			cmp al ,CharSent
+			je check_choice_1
+			jmp lop3_3	
+    
+	check_choice_1:
+	        cmp al ,32h 
+			je start_game
+
+			jmp go_again	
+				  
+   
 		
 	start_game:
-     	mov ah , 00h  ;change to vedio mode
-		mov Al , 13h
-		int 10h
+	     Mov ah , 00h  ;change to vedio mode
+	     Mov Al , 13h
+	     int 10h
 		CALL INITIALIZE_SCREEN 
 		CALL INTIALIZE_SCORE
-	   
+		 
+
+		 cmp CharReceived , 3Fh
+		 je CHAT_GAME
+		 cmp CharSent ,3Fh
+		 je CHAT_GAME
+
 		 ;print player names and chat
 		 print PLAYERNAME_1,NAME_SIZE,0,0,10
 		 print PLAYERNAME_2,NAME_SIZE,23,0,110
 		 
 		 PRINT PLAYERNAME_1,NAME_SIZE,0,21,10
-		 PRINT CHAT1,CAHT_SIZE,NAME_SIZE,21,10
+		 
 		 
 		 PRINT PLAYERNAME_2,NAME_SIZE,0,22,110
-		 PRINT CHAT2,CAHT_SIZE,NAME_SIZE,22,110	
+		 
 		 PRINT BORDER,40,0,23,01
-		 PRINT CLOSE_GAME,24,0,24,04
-
-	CHECK_TIME:
+		 PRINT CLOSE_GAME,30,0,24,04
+CHECK_TIME:
 		; add f4=>check to exit game(3Eh)
 		;Uncomment for F4 feature
-		
-	    ; call InitializUART
-
+		mov Bolean,0 
 		mov ah,1
 		int 16h
-
+		
 		JNZ DUMMY2
 
-		CHECK_TIME_CONTINUE:
+CHECK_TIME_CONTINUE:
 
-		mov AH,2Ch ;get the system time
+		MOV AH,2Ch ;get the system time
 		INT 21h    ;CH = hour CL = minute DH = second DL = 1/100 seconds
 		
-		cmp DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
+		CMP DL,TIME_AUX  ;is the current time equal to the previous one(TIME_AUX)?
 		JE CHECK_TIME    ;if it is the same, check again
 						 ;if it's different, then draw, move, etc.
 		
-		mov TIME_AUX,DL ;update time
+		MOV TIME_AUX,DL ;update time
 		
 		;DRAW the Wall
 		DRAW WALL, WALL_X, WALL_Y, WALL_WIDTH, WALL_HIGHT     ;Macro to draw wall
@@ -411,29 +468,39 @@ MAIN PROC FAR
 		DRAW PLAYER2, PLAYER_TWO_X, PLAYER_TWO_Y, PLAYER_WIDTH, PLAYER_HIGHT
 		;call DISPLAY_NAME 
 		
-		;move BALL and Draw it
+		;Move BALL and Draw it
 		CLEAR BGC, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE      ;clear old poition / Cyan
 		CALL MOVE_BALL
 		DRAW BALL, BALL_X, BALL_Y, BALL_SIZE, BALL_SIZE		 ; CALL DRAW_BALL / yellow
 		
-		; move Players
+		; Move Players
+		mov al ,'$'
+		mov CharSent ,al 
+		mov  CharReceived ,al 
+
 		CALL movePlayer1  ;move for player1 
 		CALL movePlayer2  ;move for player2  
 		
-		cmp COUNTER_END1,0
+		CMP COUNTER_END1,0
 		JE PLAYERWON
-		cmp COUNTER_END2,0
+		CMP COUNTER_END2,0
 		JE PLAYERWON
 		
 		JMP CHECK_TIME ;after everything checks time again
 		
-		;Uncomment for F4 feature
+		;Uncomment for F4/f5 feature
 		PRESSED_A_BUTTON:
-		cmp AH, 3Eh
+		CMP AH, 3Eh 
 		JE IS_F4
-
-		jmp CHECK_TIME_CONTINUE
 		
+        cmp Ah,3Fh     ;F5
+		je CHAT_GAME
+		
+		
+		JMP CHECK_TIME_CONTINUE
+
+
+		;-------------------------------------------
 		IS_F4:
 		;consume the char
 		mov ah, 0
@@ -445,16 +512,38 @@ MAIN PROC FAR
 		mov PLAYER2_SCORE,0
 		
 		JMP LABELBACK
+		
+		CHAT_GAME:
+	
+    	Again_G:
+		mov Bolean,1
+		mov ah, 0
+		int 16h
+continue_chat:
+		call send
+		cmp CharSent , 3Ch
+		je CHECK_TIME
+
+		CMP SI,1
+		je CHECK_TIME 
+		call Receive
+		
+		cmp CharReceived , 3Ch
+		je CHECK_TIME
+
+		jmp continue_chat
+	     ;)
 
 		DUMMY0: ;for jump out of range problem
-		jmp LABELBACK
+		jmp VIDEO_MODE
 
 		DUMMY1:
 		jmp LABELBACK
 
-	PLAYERWON:  
-		mov AH,0          
-		mov AL,03h
+
+PLAYERWON:  
+		MOV AH,0          
+		MOV AL,03h
 		INT 10h 
 		
 		mov ah,2        ;move cursor 
@@ -463,17 +552,17 @@ MAIN PROC FAR
 		int 10h 
 		
 
-		cmp COUNTER_END1,0
+		CMP COUNTER_END1,0
 		jne PLAYER1_DIDNT_WIN
 
-		mov AH,9
+		MOV AH,9
 		LEA DX,player1WON
 		INT 21H
 
 		JMP RESET_won
 		PLAYER1_DIDNT_WIN:
 		
-		mov AH,9
+		MOV AH,9
 		LEA DX,player2WON
 		INT 21h
 	
@@ -483,7 +572,7 @@ MAIN PROC FAR
 		mov dh,10
 		int 10h 
 		
-		mov AH,9
+		MOV AH,9
 		LEA DX,PLAY_AGIAN 
 		INT 21H
 		
@@ -493,18 +582,18 @@ MAIN PROC FAR
 	mov PLAYER1_SCORE,0
 	mov PLAYER2_SCORE,0
 	
-	mov AH,0
+	MOV AH,0
 	INT 16H
 
-	cmp AL,31H
+	CMP AL,31H
 	je  DUMMY0        ;OUT OF RANGE
 	
 	jmp  DUMMY1          ;main menue
 
-
+		
 	;return the control to the dos
 	; control_dos:	
-		; mov AH, 4CH
+		; MOV AH, 4CH
 		; INT 21H
 		
 MAIN ENDP
@@ -694,12 +783,13 @@ MOVE_BALL PROC NEAR
 			mov AX, BALL_VELOCITY_Y
 			add AX, BALL_VELOCITY_Y
 			add BALL_Y,AX             ;move the ball vertically
-			CALL INCREASE_SCORE_PLAYER2
+		    CALL INCREASE_SCORE_PLAYER2
 
 		    CALL REC_CHOICE_SYNC
-			MOV Al, CharReceived
-			MOV PLAYER2_SCORE, AL
+			;MOV Al, CharReceived
 
+			;add PLAYER2_SCORE, AL
+             
 			JMP RET_MOVE_BALL
 
 		PLAYER_2_PLAYGROUND:
@@ -708,6 +798,7 @@ MOVE_BALL PROC NEAR
 			add AX, BALL_VELOCITY_Y
 			add BALL_Y,AX             ;move the ball vertically
 			CALL INCREASE_SCORE_PLAYER1
+			
 			MOV AL, PLAYER1_SCORE
 			MOV CharSent, AL
 			CALL SEND_CHOICE_SYNC
@@ -1401,6 +1492,7 @@ InitializUART proc
 ret
 InitializUART endp
 
+;-----------------------------------------
 Send proc
 	;(
 	    
@@ -1432,9 +1524,19 @@ Send proc
 		ret
 		Not_Esc_T:
 		
+
+
+        cmp ah,3Fh
+		jne NOT_F5
+		MOV SI,1
+		RET
+       NOT_F5:
+
 		;compare with enter
 		cmp ah, 1ch
 		jne dont_scroll_line
+		cmp Bolean, 1
+		je Enter_G
 		mov UpCursorx, -1	;because it's incremented in PrintChar
 		inc UpCursory
 
@@ -1444,11 +1546,18 @@ Send proc
 		dec UpCursory
 
 		jmp Dummy001
+
+		Enter_G:
+		Scroll_Chat 0,8,21,79,21
+		mov UpCursorx_G, 8
+		
 		dont_scroll_line:
 
 		;check to remove
 		cmp ah, 0eh 	;delete scan code
 		jne Dummy001
+		cmp Bolean, 1
+		je Send_RG
 		cmp UpCursorx, 0
 		jne NotInStartX
 		;in x = 0
@@ -1481,11 +1590,32 @@ Send proc
 		int 21h
 		
 		ret
+
+		Send_RG:
+		dec UpCursorx_G
+		mov ah, 2
+		mov dl, UpCursorx_G
+		mov dh, UpCursory_G
+		int 10h
+		;print space
+		mov ah, 2
+		mov dl, 20h
+		int 21h
+		
+		ret
 		Dummy001:
 
+         cmp Bolean,1
+		 je Print2S
 		;display
 		mov bl,Up_Chat
 		call PrintChar
+		jmp RetrunSend
+
+	Print2S:
+	mov bl,Up_Chat_Game
+	call PrintCharGame	
+
 	;)
 RetrunSend:
 ret
@@ -1514,6 +1644,8 @@ Receive proc
 	 	;compare with enter
 		cmp al, 0Dh
 		jne dont_scroll_line_R
+		cmp Bolean, 1
+		je Receive_EG
 		mov DownCursorx, -1	;because it's incremented in PrintChar
 		inc DownCursory
 
@@ -1523,11 +1655,17 @@ Receive proc
 		dec DownCursory
 
 		jmp Dummy002
+
+		Receive_EG:
+		Scroll_Chat 0,8,22,79,22
+		mov DownCursorx_G, 8
 		dont_scroll_line_R:
 
 		;check to remove
 		cmp al, 08h 	;delete scan code
 		jne Dummy002
+		cmp Bolean, 1
+		je Receive_BG
 		cmp DownCursorx, 0
 		jne NotInStartX_R
 		;in x = 0
@@ -1560,10 +1698,31 @@ Receive proc
 		int 21h
 		
 		ret
+		Receive_BG:
+		dec DownCursorx_G
+		mov ah, 2
+		mov dl, DownCursorx_G
+		mov dh, DownCursory_G
+		int 10h
+		;print space
+		mov ah, 2
+		mov dl, 20h
+		int 21h
+		
+		ret
+		
 		Dummy002:
+
+		cmp Bolean,1
+        je Print2R
 
 		 mov bl,Down_Chat
 		 call PrintChar
+         jmp  RetrunReceived
+
+	Print2R:
+	 mov bl,Down_Chat_game
+	 call PrintCharGame	 
 		
 	;)
 RetrunReceived:
@@ -1592,7 +1751,7 @@ PrintChar proc
 		Scroll_Chat UpColor,0,0,79,12
 		dec UpCursory
 	DonotScrollUp:	
-		mov UpCursorx,0 ;start from the first column	
+		MOV UpCursorx,0 ;start from the first column	
 		mov dl,UpCursorx
 		mov dh,UpCursory
 		;for the upcomming character;could be removed from here and line 187 and be placed
@@ -1616,7 +1775,7 @@ PrintChar proc
 		Scroll_Chat DownColor,0,13,79,24
 		sub DownCursory,2
 	DonotScrollDown:
-		mov DownCursorx,0	
+		MOV DownCursorx,0	
 	    mov dl,DownCursorx
 		mov dh,DownCursory
 		inc DownCursorx;for the upcomming character
@@ -1642,6 +1801,68 @@ PrintChar proc
 	;)
 ret
 PrintChar endp
+
+
+PrintCharGame PROC
+
+        cmp bl,Up_Chat_Game  ; prrint up
+        JNE DOWN_Cursor_Game		
+		
+		;mov dl,charsent
+		cmp UpCursorx_G,35 ;end of the line
+		je UpCursoryLine_G
+		
+		mov dl,UpCursorx_G
+		mov dh,UpCursory_G
+		inc UpCursorx_G
+		JMP Cursor_move_G
+		
+	UpCursoryLine_G:
+		Mov UpCursorx_G,8
+		Scroll_Chat 0,8,21,40,21
+		
+		jmp Cursor_move_G
+		
+	DOWN_Cursor_Game:
+		cmp DownCursorx_G,35;end of the line
+		je DownpCursoryLine_G
+		
+		mov dl,DownCursorx_G
+		mov dh,DownCursory_G 
+		inc DownCursorx_G
+		jmp Cursor_move_G
+	DownpCursoryLine_G:
+		mov  DownCursorx_G,8
+		Scroll_Chat 0,8,22,40,22
+		;mov UpCursory_G,22
+		;sub DownCursory,2
+	
+		
+		Cursor_move_G:
+		mov ah,2 
+		mov bh,0;page;;;;;;;;;;;;;;important
+		int 10h   ;excute 
+		
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+		;Print the character:
+	    cmp bl,Up_Chat_Game  ; print up
+        JNE DownPrint_G
+		mov dl,charsent
+		jmp PrintLabel_G	
+		
+	DownPrint_g:	
+		mov dl,CharReceived
+		
+	PrintLabel_G:	
+		mov ah, 2
+        int 21h 
+	;)
+ret
+
+PrintCharGame endp 
+
+
+
 ;------------------------------------------------------
 Receive_Action Proc
 
