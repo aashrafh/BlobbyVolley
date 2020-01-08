@@ -3,12 +3,22 @@
  <img width=400px height=210px src="https://github.com/aashrafh/BlobbyVolley/blob/master/demo/logo.png" alt="BlobbyVolley logo"></a>
 </p>
 
-<div align="center">
-
-  [![Status](https://img.shields.io/badge/status-active-success.svg)]()
-  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
-
-</div>
+<p align="center">
+  <a href="https://github.com/aashrafh/BlobbyVolley/graphs/contributors" alt="Contributors">
+        <img src="https://img.shields.io/github/contributors/aashrafh/BlobbyVolley" /></a>
+  
+   <a href="https://github.com/aashrafh/BlobbyVolley/issues" alt="Issues">
+        <img src="https://img.shields.io/github/issues/aashrafh/BlobbyVolley" /></a>
+  
+  <a href="https://github.com/aashrafh/BlobbyVolley/network" alt="Forks">
+        <img src="https://img.shields.io/github/forks/aashrafh/BlobbyVolley" /></a>
+        
+  <a href="https://github.com/aashrafh/BlobbyVolley/stargazers" alt="Stars">
+        <img src="https://img.shields.io/github/stars/aashrafh/BlobbyVolley" /></a>
+        
+  <a href="https://github.com/aashrafh/BlobbyVolley/blob/master/LICENSE" alt="License">
+        <img src="https://img.shields.io/github/license/aashrafh/BlobbyVolley" /></a>
+</p>
 
 ---
 
