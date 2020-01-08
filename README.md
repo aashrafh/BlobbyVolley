@@ -28,7 +28,7 @@ It is the well-known game named ```Blobby Volley``` coded in assembly language w
 
 The rules used in Blobby Volley are derived from the standard volleyball rules. Unlike real volleyball, the movements of the players are limited to the two-dimensional space of the screen. The borders of the screen acts as an invisible wall which the ball bounces off, which is completely legal to use. Since there is only one player on each side of the field, it is permitted for the player to touch the ball several times in a row.
 
-## 🎥 Demo 
+## 📷 Screenshots
 <div name="demo" align="center" width=1189px>
   <p align="center">
     <img width=800px height=410px src="https://github.com/aashrafh/BlobbyVolley/blob/master/demo/demo-img-1.png" alt="Image Demo">
